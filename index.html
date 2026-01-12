@@ -1,76 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>ATC Ground Point Airports</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ATC Ground Point Airports</title>
 
-  <!-- Globe.gl from CDN (per README) -->
-  <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
-</head>
-<body>
-  <header class="header">
-    <h1>ATC Ground Point Airports</h1>
-    <p>Browse base, in-development, and released airports on an interactive 3D globe.</p>
-  </header>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
 
-  <main class="main">
-    <section class="sidebar">
-      <!-- filters / list unchanged -->
-      <div class="filters">
-        <h2>Filters</h2>
-        <label>
-          <input type="checkbox" id="filter-base" checked />
-          Base airports
-        </label>
-        <label>
-          <input type="checkbox" id="filter-in-dev" checked />
-          In development
-        </label>
-        <label>
-          <input type="checkbox" id="filter-released" checked />
-          Released
-        </label>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Globe.gl -->
+    <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
+  </head>
+
+  <body class="bg-body">
+    <!-- Header -->
+    <header class="py-3 border-bottom bg-header text-light">
+      <div class="container-fluid">
+        <h1 class="h4 mb-1">ATC Ground Point Airports</h1>
+        <p class="mb-0 small text-light">
+          Browse base, in-development, and released airports on an interactive
+          3d globe.
+        </p>
       </div>
+    </header>
 
-      <div class="legend">
-        <h2>Legend</h2>
-        <div class="legend-item">
-          <span class="legend-dot legend-base"></span>
-          Base
-        </div>
-        <div class="legend-item">
-          <span class="legend-dot legend-in-dev"></span>
-          In development
-        </div>
-        <div class="legend-item">
-          <span class="legend-dot legend-released"></span>
-          Released
+    <!-- Main content -->
+    <main class="d-flex flex-column flex-grow-1 min-vh-100">
+      <div class="container-fluid flex-grow-1 overflow-hidden py-2">
+        <div class="row g-3">
+          <!-- Sidebar -->
+          <aside
+            class="col-12 col-lg-3 d-flex flex-column sidebar rounded-3 p-3"
+          >
+            <section class="mb-3">
+              <h2 class="h6 mb-2">Filters</h2>
+              <div class="form-check small mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="filter-base"
+                  checked
+                />
+                <label class="form-check-label" for="filter-base"
+                  >Base airports</label
+                >
+              </div>
+              <div class="form-check small mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="filter-in-dev"
+                  checked
+                />
+                <label class="form-check-label" for="filter-in-dev"
+                  >In development</label
+                >
+              </div>
+              <div class="form-check small mb-1">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="filter-released"
+                  checked
+                />
+                <label class="form-check-label" for="filter-released"
+                  >Released</label
+                >
+              </div>
+            </section>
+
+            <section class="mb-3">
+              <h2 class="h6 mb-2">Legend</h2>
+              <div class="legend-item">
+                <span class="legend-dot legend-base"></span>
+                <span class="small">Base</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot legend-in-dev"></span>
+                <span class="small">In development</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot legend-released"></span>
+                <span class="small">Released</span>
+              </div>
+            </section>
+
+            <section
+              class="airport-list flex-grow-1 d-flex flex-column min-h-0"
+            >
+              <h2 class="h6 mb-2">Airports</h2>
+              <input
+                type="text"
+                id="search"
+                class="form-control form-control-sm mb-2"
+                placeholder="Search by ICAO or name"
+              />
+              <ul
+                id="airport-list"
+                class="list-unstyled flex-grow-1 overflow-auto mb-0"
+              ></ul>
+            </section>
+          </aside>
+
+          <!-- Globe Column -->
+          <section class="col-12 col-lg-9 globe-column d-flex">
+            <div class="globe-wrapper rounded-3 flex-grow-1">
+              <div id="globe" class="w-100 h-100"></div>
+            </div>
+          </section>
         </div>
       </div>
+    </main>
 
-      <div class="airport-list">
-        <h2>Airports</h2>
-        <input
-          type="text"
-          id="search"
-          placeholder="Search by ICAO or name"
-        />
-        <ul id="airport-list"></ul>
+    <!-- Footer -->
+    <footer class="py-2 border-top bg-footer text-muted small">
+      <div class="container-fluid">
+        ATC Ground Point | Community airport overview
       </div>
-    </section>
+    </footer>
 
-    <section class="globe-container">
-      <div id="globe"></div>
-    </section>
-  </main>
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
 
-  <footer class="footer">
-    <span>ATC Ground Point | Community airport overview</span>
-  </footer>
-
-  <!-- Load your JS AFTER Globe.gl and after the DOM elements exist -->
-  <script src="main.js"></script>
-</body>
+    <!-- Custom JS -->
+    <script src="main.js"></script>
+  </body>
 </html>

@@ -11,12 +11,26 @@ let filteredAirports = [];
 let globeInstance = null;
 
 async function loadAirports() {
-  const res = await fetch("data/airports.json");
-  if (!res.ok) {
-    console.error("Failed to load airports.json", res.status, res.statusText);
-    return [];
+  try {
+    const res = await fetch("data/airports.json");
+    if (!res.ok) {
+      console.error("Failed to load airports.json", res.status, res.statusText);
+      return [];
+    }
+    return await res.json();
+  } catch (err) {
+    console.error("Error fetching airports.json:", err);
+    // Optional: tiny fallback so you see *something*
+    return [
+      {
+        icao: "YBBN",
+        name: "Brisbane Airport",
+        lat: -27.3842,
+        lng: 153.1175,
+        status: "released"
+      }
+    ];
   }
-  return res.json();
 }
 
 function statusLabel(status) {

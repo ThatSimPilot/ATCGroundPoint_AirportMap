@@ -1,76 +1,39 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* General */
+html, body {
+  height: 100%;
 }
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #050816;
   color: #f7fafc;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden; /* prevent horizontal scroll */
 }
 
-.header {
-  padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+/* Header / Footer / Theme */
+.bg-body {
+  background: #050816;
+}
+
+.bg-header {
   background: radial-gradient(circle at top left, #1a365d, #020617);
 }
 
-.header h1 {
-  font-size: 1.6rem;
-  margin-bottom: 0.25rem;
+.bg-footer {
+  background: #020617;
 }
 
-.header p {
-  font-size: 0.9rem;
-  opacity: 0.7;
-}
-
-.main {
-  flex: 1;
-  display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: 0;
-  min-height: 0;
-}
-
+/* Sidebar */
 .sidebar {
-  padding: 1rem 1.5rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(to bottom, #020617, #020617);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  background: #020617;
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-.filters h2,
-.legend h2,
-.airport-list h2 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.filters label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-  cursor: pointer;
-}
-
-.filters input[type="checkbox"] {
-  accent-color: #38bdf8;
-}
-
+/* Legend */
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
+  gap: 0.4rem;
   margin-bottom: 0.25rem;
 }
 
@@ -78,7 +41,6 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  display: inline-block;
 }
 
 .legend-base {
@@ -93,37 +55,18 @@ body {
   background: #48bb78;
 }
 
+/* Airport list */
 .airport-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   min-height: 0;
 }
 
-#search {
-  width: 100%;
-  padding: 0.4rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  background: rgba(15, 23, 42, 0.9);
-  color: #e2e8f0;
-  font-size: 0.85rem;
-  margin-bottom: 0.5rem;
-}
-
-#search::placeholder {
-  color: #64748b;
-}
-
 #airport-list {
-  list-style: none;
-  overflow-y: auto;
   padding-right: 0.25rem;
 }
 
 .airport-item {
-  padding: 0.4rem 0.3rem;
-  border-radius: 6px;
+  padding: 0.4rem 0.35rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.85rem;
   display: flex;
@@ -132,7 +75,7 @@ body {
 }
 
 .airport-item:hover {
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(148, 163, 184, 0.12);
 }
 
 .airport-meta {
@@ -142,8 +85,9 @@ body {
 
 .status-pill {
   font-size: 0.7rem;
-  padding: 0.1rem 0.4rem;
+  padding: 0.1rem 0.45rem;
   border-radius: 999px;
+  white-space: nowrap;
 }
 
 .status-base {
@@ -158,9 +102,19 @@ body {
   background: rgba(72, 187, 120, 0.18);
 }
 
-.globe-container {
+/* Globe Layout */
+.globe-column {
+  background: #020617; /* fills entire right side */
+}
+
+.globe-wrapper {
   position: relative;
-  min-height: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  background: #020617;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  overflow: hidden;
 }
 
 #globe {
@@ -168,27 +122,18 @@ body {
   height: 100%;
 }
 
-.footer {
-  padding: 0.5rem 1.5rem;
-  font-size: 0.75rem;
-  opacity: 0.7;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: #020617;
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .globe-wrapper {
+    min-height: 280px;
+  }
+  .sidebar {
+    margin-bottom: 0.5rem;
+  }
 }
 
-/* Mobile layout */
-@media (max-width: 768px) {
-  .main {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-  }
-
-  .sidebar {
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .globe-container {
-    height: 60vh;
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .globe-wrapper {
+    min-height: 320px;
   }
 }
