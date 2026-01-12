@@ -1,0 +1,25 @@
+[
+  {
+    "icao": "YBBN",
+    "name": "Brisbane Airport",
+    "lat": -27.3842,
+    "lng": 153.1175,
+    "status": "released", 
+    "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=123456"
+  },
+  {
+    "icao": "YSSY",
+    "name": "Sydney Kingsford Smith",
+    "lat": -33.9461,
+    "lng": 151.1772,
+    "status": "in_dev",
+    "discordThread": "https://discord.com/channels/.../..."
+  },
+  {
+    "icao": "YMML",
+    "name": "Melbourne Airport",
+    "lat": -37.6733,
+    "lng": 144.8433,
+    "status": "base"
+  }
+]

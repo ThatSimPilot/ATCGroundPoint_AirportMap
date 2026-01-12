@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ATC Ground Point Airports</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Globe.gl from CDN (per README) -->
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+</head>
+<body>
+  <header class="header">
+    <h1>ATC Ground Point Airports</h1>
+    <p>Browse base, in-development, and released airports on an interactive 3D globe.</p>
+  </header>
+
+  <main class="main">
+    <section class="sidebar">
+      <!-- filters / list unchanged -->
+      <div class="filters">
+        <h2>Filters</h2>
+        <label>
+          <input type="checkbox" id="filter-base" checked />
+          Base airports
+        </label>
+        <label>
+          <input type="checkbox" id="filter-in-dev" checked />
+          In development
+        </label>
+        <label>
+          <input type="checkbox" id="filter-released" checked />
+          Released
+        </label>
+      </div>
+
+      <div class="legend">
+        <h2>Legend</h2>
+        <div class="legend-item">
+          <span class="legend-dot legend-base"></span>
+          Base
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot legend-in-dev"></span>
+          In development
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot legend-released"></span>
+          Released
+        </div>
+      </div>
+
+      <div class="airport-list">
+        <h2>Airports</h2>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search by ICAO or name"
+        />
+        <ul id="airport-list"></ul>
+      </div>
+    </section>
+
+    <section class="globe-container">
+      <div id="globe"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>ATC Ground Point | Community airport overview</span>
+  </footer>
+
+  <!-- Load your JS AFTER Globe.gl and after the DOM elements exist -->
+  <script src="main.js"></script>
+</body>
+</html>
