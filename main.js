@@ -10,6 +10,8 @@ let allAirports = [];
 let filteredAirports = [];
 let globeInstance = null;
 
+const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
+
 async function loadAirports() {
   try {
     const res = await fetch("data/airports.json");
@@ -47,7 +49,6 @@ function createGlobe(airports) {
     return;
   }
 
-  // Globe is provided globally by the CDN script
   globeInstance = new Globe(container, {
     animateIn: true
   })
@@ -70,6 +71,23 @@ function createGlobe(airports) {
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.5;
     });
+
+  // 🔹 Sync globe size with the Bootstrap layout
+  function resizeGlobeToContainer() {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (!width || !height) return;
+
+    globeInstance.width(width);
+    globeInstance.height(height);
+  }
+
+  // Initial sizing
+  resizeGlobeToContainer();
+
+  // Update when the flex layout / container size changes
+  const ro = new ResizeObserver(resizeGlobeToContainer);
+  ro.observe(container);
 }
 
 function updateGlobePoints(airports) {
@@ -84,6 +102,8 @@ function updateGlobePoints(airports) {
 
 function renderAirportList(airports) {
   const listEl = document.getElementById("airport-list");
+  if (!listEl) return;
+
   listEl.innerHTML = "";
 
   airports
@@ -138,13 +158,70 @@ function focusOnAirport(airport) {
   }
 }
 
+/* ---------- LocalStorage helpers ---------- */
+
+function loadFilterState() {
+  try {
+    const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
+    if (!raw) return;
+
+    const data = JSON.parse(raw);
+
+    const filterBase = document.getElementById("filter-base");
+    const filterInDev = document.getElementById("filter-in-dev");
+    const filterReleased = document.getElementById("filter-released");
+    const searchInput = document.getElementById("search");
+
+    if (filterBase && typeof data.base === "boolean") {
+      filterBase.checked = data.base;
+    }
+    if (filterInDev && typeof data.inDev === "boolean") {
+      filterInDev.checked = data.inDev;
+    }
+    if (filterReleased && typeof data.released === "boolean") {
+      filterReleased.checked = data.released;
+    }
+    if (searchInput && typeof data.search === "string") {
+      searchInput.value = data.search;
+    }
+  } catch (e) {
+    console.warn("Could not load filter state from localStorage:", e);
+  }
+}
+
+function saveFilterState() {
+  try {
+    const filterBase = document.getElementById("filter-base");
+    const filterInDev = document.getElementById("filter-in-dev");
+    const filterReleased = document.getElementById("filter-released");
+    const searchInput = document.getElementById("search");
+
+    const data = {
+      base: filterBase ? filterBase.checked : true,
+      inDev: filterInDev ? filterInDev.checked : true,
+      released: filterReleased ? filterReleased.checked : true,
+      search: searchInput ? searchInput.value : ""
+    };
+
+    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn("Could not save filter state to localStorage:", e);
+  }
+}
+
+/* ---------- Filtering ---------- */
+
 function applyFilters() {
-  const showBase = document.getElementById("filter-base").checked;
-  const showInDev = document.getElementById("filter-in-dev").checked;
-  const showReleased = document.getElementById("filter-released").checked;
-  const searchValue = document
-    .getElementById("search")
-    .value.trim()
+  const filterBase = document.getElementById("filter-base");
+  const filterInDev = document.getElementById("filter-in-dev");
+  const filterReleased = document.getElementById("filter-released");
+  const searchInput = document.getElementById("search");
+
+  const showBase = filterBase ? filterBase.checked : true;
+  const showInDev = filterInDev ? filterInDev.checked : true;
+  const showReleased = filterReleased ? filterReleased.checked : true;
+  const searchValue = (searchInput ? searchInput.value : "")
+    .trim()
     .toLowerCase();
 
   filteredAirports = allAirports.filter(a => {
@@ -162,7 +239,12 @@ function applyFilters() {
 
   updateGlobePoints(filteredAirports);
   renderAirportList(filteredAirports);
+
+  // Persist current settings
+  saveFilterState();
 }
+
+/* ---------- Init ---------- */
 
 async function init() {
   allAirports = await loadAirports();
@@ -171,17 +253,23 @@ async function init() {
   createGlobe(allAirports);
   renderAirportList(allAirports);
 
-  document
-    .getElementById("filter-base")
-    .addEventListener("change", applyFilters);
-  document
-    .getElementById("filter-in-dev")
-    .addEventListener("change", applyFilters);
-  document
-    .getElementById("filter-released")
-    .addEventListener("change", applyFilters);
-  document.getElementById("search").addEventListener("input", applyFilters);
+  // Restore saved filters & search before wiring listeners
+  loadFilterState();
+
+  const filterBase = document.getElementById("filter-base");
+  const filterInDev = document.getElementById("filter-in-dev");
+  const filterReleased = document.getElementById("filter-released");
+  const searchInput = document.getElementById("search");
+
+  filterBase && filterBase.addEventListener("change", applyFilters);
+  filterInDev && filterInDev.addEventListener("change", applyFilters);
+  filterReleased &&
+    filterReleased.addEventListener("change", applyFilters);
+  searchInput && searchInput.addEventListener("input", applyFilters);
+
+  // Apply filters once with restored state
+  applyFilters();
 }
 
-// Make sure DOM is ready
+// Single load handler
 window.addEventListener("load", init);

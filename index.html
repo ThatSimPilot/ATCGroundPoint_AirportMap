@@ -20,10 +20,10 @@
     <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
   </head>
 
-  <body class="bg-body">
+  <body>
     <!-- Header -->
-    <header class="py-3 border-bottom bg-header text-light">
-      <div class="container-fluid">
+    <header class="py-3 bg-header text-light header-bar border-bottom">
+      <div class="container-fluid px-3">
         <h1 class="h4 mb-1">ATC Ground Point Airports</h1>
         <p class="mb-0 small text-light">
           Browse base, in-development, and released airports on an interactive
@@ -34,11 +34,13 @@
 
     <!-- Main content -->
     <main class="d-flex flex-column flex-grow-1 min-vh-100">
-      <div class="container-fluid flex-grow-1 overflow-hidden py-2">
-        <div class="row g-3">
+      <div class="container-fluid flex-grow-1 overflow-hidden py-2 px-3">
+        <!-- Custom flex layout instead of Bootstrap row/cols -->
+        <div id="main-layout" class="main-layout">
           <!-- Sidebar -->
           <aside
-            class="col-12 col-lg-3 d-flex flex-column sidebar rounded-3 p-3"
+            id="sidebar"
+            class="sidebar d-flex flex-column rounded-3 p-3"
           >
             <section class="mb-3">
               <h2 class="h6 mb-2">Filters</h2>
@@ -111,9 +113,11 @@
           </aside>
 
           <!-- Globe Column -->
-          <section class="col-12 col-lg-9 globe-column d-flex">
-            <div class="globe-wrapper rounded-3 flex-grow-1">
-              <div id="globe" class="w-100 h-100"></div>
+          <section class="globe-column">
+            <div class="globe-inner">
+              <div class="globe-wrapper rounded-3">
+                <div id="globe" class="w-100 h-100"></div>
+              </div>
             </div>
           </section>
         </div>
@@ -121,8 +125,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-2 border-top bg-footer text-muted small">
-      <div class="container-fluid">
+    <footer class="py-2 bg-footer text-muted small footer-bar border-top">
+      <div class="container-fluid px-3">
         ATC Ground Point | Community airport overview
       </div>
     </footer>
