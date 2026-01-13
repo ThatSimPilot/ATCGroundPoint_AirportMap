@@ -9,7 +9,27 @@ body {
     sans-serif;
   background: #050816;
   color: #f7fafc;
-  overflow-x: hidden;
+
+  /* key bits */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden; /* no page scroll - both axes */
+}
+
+/* make <main> the flexible center band between header and footer */
+main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow it to shrink inside the viewport */
+}
+
+main > .container-fluid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header / footer borders – darker so they don't look like white gaps */
@@ -34,8 +54,8 @@ body {
 .main-layout {
   display: flex;
   flex-direction: row;
-  height: calc(100vh - 96px); /* approx header+footer; adjust if needed */
-  min-height: 400px;
+  flex: 1 1 auto;
+  min-height: 0; /* critical to avoid extra page height */
 }
 
 /* Sidebar with fixed width */
@@ -69,21 +89,30 @@ body {
 }
 
 .globe-wrapper {
-  flex: 1;
+  flex: 1 1 auto;
+  width: 100%;
   height: 100%;
-  min-height: 350px;
+  min-height: 0; /* or keep a small min-height if you like, see note below */
   background: #020617;
   border: 1px solid rgba(148, 163, 184, 0.25);
   overflow: hidden;
+  position: relative;
+
+  /* Center the globe area inside this wrapper */
+  display: flex;
+  align-items: center;      /* vertical center */
+  justify-content: center;  /* horizontal center */
 }
 
-/* Container and canvas both scale to parent */
+/* Make sure #globe itself can flex and shrink with the wrapper */
 #globe {
   width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 
-/* Make sure the internal canvas follows the container size */
+/* And keep the canvas matching the container */
 #globe canvas {
   width: 100% !important;
   height: 100% !important;
@@ -190,6 +219,39 @@ body {
 
 .status-released {
   background: rgba(72, 187, 120, 0.18);
+}
+
+.airport-details-card {
+  position: absolute;
+  left: 12px;
+  right: auto;
+  bottom: 12px;
+  max-width: 360px;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: #e5e7eb;
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  font-size: 0.85rem;
+}
+
+.airport-details-card .text-secondary {
+  color: #9ca3af !important;
+}
+
+.airport-details-card .badge {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Optional: dim link if no external URL */
+.airport-details-card a.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  text-decoration: none;
 }
 
 /* Responsive: stack vertically on small screens, no separator */

@@ -9,29 +9,71 @@ const STATUS_COLORS = {
 let allAirports = [];
 let filteredAirports = [];
 let globeInstance = null;
+let globeResizeObserver = null;
 
 const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
 
+// Auto-rotate / interaction pause state
+let orbitControls = null;
+let autoRotateTimeoutId = null;
+
+// ---------- Data loading ----------
+
 async function loadAirports() {
   try {
-    const res = await fetch("data/airports.json");
+    const res = await fetch("data/airports.json", {
+      cache: "no-store" // optional but useful to avoid stale browser caching
+    });
+
     if (!res.ok) {
       console.error("Failed to load airports.json", res.status, res.statusText);
-      return [];
+      return {
+        schemaVersion: 1,
+        lastUpdated: null,
+        airports: [
+          {
+            icao: "ERROR",
+            name: "Error Loading Airports",
+            lat: 0,
+            lng: 0,
+            status: "unknown",
+            defaultIncluded: true
+          }
+        ]
+      };
     }
-    return await res.json();
+
+    const data = await res.json();
+
+    // Defensive normalization:
+    const schemaVersion = data.schemaVersion || 1;
+    const lastUpdated = data.lastUpdated || null;
+    const airports = Array.isArray(data.airports) ? data.airports : [];
+
+    return {
+      schemaVersion,
+      lastUpdated,
+      airports
+    };
+
   } catch (err) {
     console.error("Error fetching airports.json:", err);
-    // Optional: tiny fallback so you see *something*
-    return [
-      {
-        icao: "YBBN",
-        name: "Brisbane Airport",
-        lat: -27.3842,
-        lng: 153.1175,
-        status: "released"
-      }
-    ];
+
+    // Same fallback but wrapped in the new structure
+    return {
+      schemaVersion: 1,
+      lastUpdated: null,
+      airports: [
+        {
+          icao: "ERROR",
+          name: "Error Loading Airports",
+          lat: 0,
+          lng: 0,
+          status: "unknown",
+          defaultIncluded: true
+        }
+      ]
+    };
   }
 }
 
@@ -41,6 +83,79 @@ function statusLabel(status) {
   if (status === "released") return "Released";
   return status || "Unknown";
 }
+
+// ---------- Resize Globe Helper ----------
+
+function syncGlobeToContainerSize() {
+  if (!globeInstance) return;
+  const container = document.getElementById("globe");
+  if (!container) return;
+
+  const rect = container.getBoundingClientRect();
+  const width = rect.width;
+  const height = rect.height;
+
+  if (!width || !height) return;
+
+  globeInstance.width(width);
+  globeInstance.height(height);
+}
+
+function setupGlobeResizeHandling() {
+  const container = document.getElementById("globe");
+  if (!container || !globeInstance) return;
+
+  // Initial sync
+  syncGlobeToContainerSize();
+
+  // Clean up any existing observer
+  if (globeResizeObserver) {
+    globeResizeObserver.disconnect();
+  }
+
+  // Use ResizeObserver so it reacts to any layout change,
+  // including sidebars, devtools, etc.
+  globeResizeObserver = new ResizeObserver(() => {
+    syncGlobeToContainerSize();
+  });
+  globeResizeObserver.observe(container);
+
+  // Fallback: also listen for window resize
+  window.addEventListener("resize", syncGlobeToContainerSize);
+}
+
+// ---------- Auto-rotate interaction helpers ----------
+
+function setupAutoRotateInteraction(controls) {
+  orbitControls = controls;
+  if (!controls || typeof controls.addEventListener !== "function") return;
+
+  const handleUserInteraction = () => {
+    // Pause and schedule resume in 5s
+    pauseAutoRotate();
+  };
+
+  // "start" and "end" are triggered by user input,
+  // but NOT by autoRotate animation
+  controls.addEventListener("start", handleUserInteraction);
+  controls.addEventListener("end", handleUserInteraction);
+}
+
+function pauseAutoRotate(delay = 5000) {
+  if (!orbitControls) return;
+
+  orbitControls.autoRotate = false;
+
+  if (autoRotateTimeoutId) {
+    clearTimeout(autoRotateTimeoutId);
+  }
+
+  autoRotateTimeoutId = setTimeout(() => {
+    orbitControls.autoRotate = true;
+  }, delay);
+}
+
+// ---------- Globe ----------
 
 function createGlobe(airports) {
   const container = document.getElementById("globe");
@@ -62,32 +177,31 @@ function createGlobe(airports) {
     .pointAltitude(() => 0.015)
     .pointRadius(() => 0.18)
     .pointLabel(d => {
-      let line1 = `${d.icao || "N/A"} – ${d.name || "Unknown"}`;
-      let line2 = `Status: ${statusLabel(d.status)}`;
-      return `${line1}<br/>${line2}`;
+      const icao = d.icao || "N/A";
+      const name = d.name || "Unknown";
+      const status = statusLabel(d.status);
+      return `${icao} – ${name}<br/>Status: ${status}`;
     })
-    .onGlobeReady(() => {
+    // Make markers behave like list clicks
+    .onPointClick(point => {
+      if (point) {
+        focusOnAirport(point);
+      }
+    })
+     .onGlobeReady(() => {
       const controls = globeInstance.controls();
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.5;
+      if (controls) {
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.5;
+
+        // Hook pause/resume on user interaction
+        setupAutoRotateInteraction(controls);
+      }
+
+      // Sync size and keep globe centered within its section
+      setupGlobeResizeHandling();
     });
 
-  // 🔹 Sync globe size with the Bootstrap layout
-  function resizeGlobeToContainer() {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    if (!width || !height) return;
-
-    globeInstance.width(width);
-    globeInstance.height(height);
-  }
-
-  // Initial sizing
-  resizeGlobeToContainer();
-
-  // Update when the flex layout / container size changes
-  const ro = new ResizeObserver(resizeGlobeToContainer);
-  ro.observe(container);
 }
 
 function updateGlobePoints(airports) {
@@ -119,7 +233,11 @@ function renderAirportList(airports) {
 
       const meta = document.createElement("div");
       meta.className = "airport-meta";
-      meta.textContent = `${a.lat.toFixed(2)}, ${a.lng.toFixed(2)}`;
+      if (typeof a.lat === "number" && typeof a.lng === "number") {
+        meta.textContent = `${a.lat.toFixed(2)}, ${a.lng.toFixed(2)}`;
+      } else {
+        meta.textContent = "";
+      }
 
       left.appendChild(title);
       left.appendChild(meta);
@@ -131,6 +249,7 @@ function renderAirportList(airports) {
       li.appendChild(left);
       li.appendChild(pill);
 
+      // List click behaves like marker click
       li.addEventListener("click", () => focusOnAirport(a));
 
       listEl.appendChild(li);
@@ -138,27 +257,77 @@ function renderAirportList(airports) {
 }
 
 function focusOnAirport(airport) {
-  if (!globeInstance) return;
+  if (!globeInstance || !airport) return;
 
   globeInstance.pointOfView(
-    { lat: airport.lat, lng: airport.lng, altitude: 1.5 },
-    1000
+    {
+      lat: airport.lat,
+      lng: airport.lng,
+      altitude: 0.9 // zoom in when focusing
+    },
+    1250 // easing duration (ms)
   );
 
-  const controls = globeInstance.controls();
-  const previousAutoRotate = controls.autoRotate;
-  controls.autoRotate = false;
-  setTimeout(() => {
-    controls.autoRotate = previousAutoRotate;
-  }, 5000);
+  // Pause autorotate a bit longer after focus
+  pauseAutoRotate(6000);
 
-  const link = airport.workshopUrl || airport.discordThread;
-  if (link && confirm("Open airport page in a new tab?")) {
-    window.open(link, "_blank");
-  }
+  showAirportDetails(airport);
 }
 
-/* ---------- LocalStorage helpers ---------- */
+function showAirportDetails(airport) {
+  const details = document.getElementById("airport-details");
+  if (!details || !airport) return;
+
+  const icaoEl = document.getElementById("airport-details-icao");
+  const nameEl = document.getElementById("airport-details-name");
+  const statusEl = document.getElementById("airport-details-status");
+  const coordsEl = document.getElementById("airport-details-coords");
+  const linkEl = document.getElementById("airport-details-link");
+
+  if (icaoEl) icaoEl.textContent = airport.icao || "N/A";
+  if (nameEl) nameEl.textContent = airport.name || "Unknown";
+
+  if (statusEl) {
+    const statusText = statusLabel(airport.status);
+    statusEl.textContent = statusText || "Unknown";
+
+    statusEl.className = "badge rounded-pill";
+    if (airport.status === "base") {
+      statusEl.classList.add("bg-secondary");
+    } else if (airport.status === "in_dev") {
+      statusEl.classList.add("bg-warning", "text-dark");
+    } else if (airport.status === "released") {
+      statusEl.classList.add("bg-success");
+    }
+  }
+
+  if (coordsEl) {
+    if (typeof airport.lat === "number" && typeof airport.lng === "number") {
+      coordsEl.textContent = `${airport.lat.toFixed(2)}, ${airport.lng.toFixed(
+        2
+      )}`;
+    } else {
+      coordsEl.textContent = "";
+    }
+  }
+
+  if (linkEl) {
+    const link = airport.workshopUrl || airport.discordThread || null;
+    if (link) {
+      linkEl.href = link;
+      linkEl.classList.remove("disabled");
+      linkEl.textContent = "Open airport page";
+    } else {
+      linkEl.href = "#";
+      linkEl.classList.add("disabled");
+      linkEl.textContent = "No external link";
+    }
+  }
+
+  details.classList.remove("d-none");
+}
+
+// ---------- LocalStorage helpers ----------
 
 function loadFilterState() {
   try {
@@ -209,7 +378,7 @@ function saveFilterState() {
   }
 }
 
-/* ---------- Filtering ---------- */
+// ---------- Filtering ----------
 
 function applyFilters() {
   const filterBase = document.getElementById("filter-base");
@@ -240,20 +409,31 @@ function applyFilters() {
   updateGlobePoints(filteredAirports);
   renderAirportList(filteredAirports);
 
-  // Persist current settings
   saveFilterState();
 }
 
-/* ---------- Init ---------- */
+// ---------- Init ----------
 
 async function init() {
-  allAirports = await loadAirports();
-  filteredAirports = allAirports.slice();
+  // Load full data object
+  const data = await loadAirports();
+  const airports = Array.isArray(data.airports) ? data.airports : [];
 
-  createGlobe(allAirports);
-  renderAirportList(allAirports);
+  // Store globally
+  allAirports = airports;
+  filteredAirports = airports.slice();
 
-  // Restore saved filters & search before wiring listeners
+  // Create globe + initial list
+  createGlobe(filteredAirports);
+  renderAirportList(filteredAirports);
+
+  // (Optional) if you want to show lastUpdated somewhere later:
+  // const lastUpdatedEl = document.getElementById("last-updated");
+  // if (lastUpdatedEl && data.lastUpdated) {
+  //   lastUpdatedEl.textContent = data.lastUpdated;
+  // }
+
+  // Restore filters from localStorage, then apply them
   loadFilterState();
 
   const filterBase = document.getElementById("filter-base");
@@ -261,15 +441,12 @@ async function init() {
   const filterReleased = document.getElementById("filter-released");
   const searchInput = document.getElementById("search");
 
-  filterBase && filterBase.addEventListener("change", applyFilters);
-  filterInDev && filterInDev.addEventListener("change", applyFilters);
-  filterReleased &&
-    filterReleased.addEventListener("change", applyFilters);
-  searchInput && searchInput.addEventListener("input", applyFilters);
+  if (filterBase) filterBase.addEventListener("change", applyFilters);
+  if (filterInDev) filterInDev.addEventListener("change", applyFilters);
+  if (filterReleased) filterReleased.addEventListener("change", applyFilters);
+  if (searchInput) searchInput.addEventListener("input", applyFilters);
 
-  // Apply filters once with restored state
   applyFilters();
 }
 
-// Single load handler
 window.addEventListener("load", init);

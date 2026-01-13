@@ -33,15 +33,12 @@
     </header>
 
     <!-- Main content -->
-    <main class="d-flex flex-column flex-grow-1 min-vh-100">
+    <main class="d-flex flex-column flex-grow-1">
       <div class="container-fluid flex-grow-1 overflow-hidden py-2 px-3">
         <!-- Custom flex layout instead of Bootstrap row/cols -->
         <div id="main-layout" class="main-layout">
           <!-- Sidebar -->
-          <aside
-            id="sidebar"
-            class="sidebar d-flex flex-column rounded-3 p-3"
-          >
+          <aside id="sidebar" class="sidebar d-flex flex-column rounded-3 p-3">
             <section class="mb-3">
               <h2 class="h6 mb-2">Filters</h2>
               <div class="form-check small mb-1">
@@ -117,6 +114,44 @@
             <div class="globe-inner">
               <div class="globe-wrapper rounded-3">
                 <div id="globe" class="w-100 h-100"></div>
+
+                <!-- Airport details overlay -->
+                <div id="airport-details" class="airport-details-card d-none">
+                  <div
+                    class="airport-details-header d-flex justify-content-between align-items-center mb-1"
+                  >
+                    <div>
+                      <div
+                        id="airport-details-icao"
+                        class="fw-semibold small"
+                      ></div>
+                      <div
+                        id="airport-details-name"
+                        class="small text-secondary"
+                      ></div>
+                    </div>
+                    <span
+                      id="airport-details-status"
+                      class="badge rounded-pill"
+                    ></span>
+                  </div>
+                  <div
+                    class="airport-details-footer d-flex justify-content-between align-items-center"
+                  >
+                    <div class="small text-secondary">
+                      <span id="airport-details-coords"></span>
+                    </div>
+                    <a
+                      id="airport-details-link"
+                      href="#"
+                      target="_blank"
+                      rel="noopener"
+                      class="small text-decoration-underline"
+                    >
+                      Open airport page
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -125,7 +160,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-2 bg-footer text-muted small footer-bar border-top">
+    <footer class="py-2 bg-footer text-light small footer-bar border-top">
       <div class="container-fluid px-3">
         ATC Ground Point | Community airport overview
       </div>
