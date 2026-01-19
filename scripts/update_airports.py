@@ -19,7 +19,7 @@ except ImportError:
 # Paths and config
 # --------------------------------------------------------------------
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 
 load_dotenv(ROOT / ".env")
@@ -37,10 +37,10 @@ STEAM_API_URL = (
     "GetPublishedFileDetails/v1/"
 )
 
-# AeroDataBox via RapidAPI
-AERODATABOX_BASE_URL = "https://aerodatabox.p.rapidapi.com"
-AERODATABOX_API_KEY = os.environ.get("AERODATABOX_API_KEY")
-AERODATABOX_HOST = "aerodatabox.p.rapidapi.com"
+# AeroDataBox via APIMarket
+APIMARKET_BASE_URL = "https://prod.api.market/api/v1/aedbx/aerodatabox"
+APIMARKET_API_KEY = os.environ.get("APIMARKET_API_KEY")
+
 
 # Discord
 DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
@@ -435,15 +435,15 @@ def fetch_discord_airports(existing_icaos: set[str],
 # --------------------------------------------------------------------
 
 def fetch_airport_from_aerodatabox(icao: str) -> dict:
-    if not AERODATABOX_API_KEY:
+    if not APIMARKET_API_KEY:
         raise RuntimeError(
-            "AERODATABOX_API_KEY is not set. Cannot call AeroDataBox."
+            "APIMARKET_API_KEY is not set. Cannot call AeroDataBox."
         )
 
-    url = f"{AERODATABOX_BASE_URL}/airports/icao/{icao}"
+    url = f"{APIMARKET_BASE_URL}/airports/icao/{icao}?withRunways=false&withTime=false"
     headers = {
-        "X-RapidAPI-Key": AERODATABOX_API_KEY,
-        "X-RapidAPI-Host": AERODATABOX_HOST,
+        "accept": "application/json",
+        "x-api-market-key": APIMARKET_API_KEY,
     }
 
     print(f"[INFO] Calling AeroDataBox for {icao}...")
@@ -456,7 +456,7 @@ def fetch_airport_from_aerodatabox(icao: str) -> dict:
 # Orchestrator
 # --------------------------------------------------------------------
 
-def main(use_aerodatabox: bool = True):
+def main(run_steam=True, run_discord=True, use_aerodatabox=True):
     """
     Master pipeline:
 
@@ -475,12 +475,19 @@ def main(use_aerodatabox: bool = True):
     ) = load_airports_state()
 
     # Step 1 - Steam
-    steam_new = fetch_steam_airports(existing_icaos)
-    steam_icaos = set(steam_new.keys())
+    if run_steam == True:
+        steam_new = fetch_steam_airports(existing_icaos)
+        steam_icaos = set(steam_new.keys())
+    else:
+        steam_new = {}
+        steam_icaos = set()
 
     # Step 2 - Discord (Steam wins on conflicts)
-    discord_new = fetch_discord_airports(existing_icaos, steam_icaos)
-
+    if run_discord == True:
+        discord_new = fetch_discord_airports(existing_icaos, steam_icaos)
+    else:
+        discord_new = {}
+  
     # Step 3 - all new ICAOs that we need to call AeroDataBox for
     new_all: dict[str, dict] = {}
     for icao, info in steam_new.items():
