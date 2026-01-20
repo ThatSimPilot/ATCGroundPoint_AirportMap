@@ -36,9 +36,6 @@ Top-level structure:
   "airports": [ ... ]
 }
 Each airport includes:
-
-json
-Copy code
 {
   "icao": "XXXX",
   "name": "Full Airport Name",
