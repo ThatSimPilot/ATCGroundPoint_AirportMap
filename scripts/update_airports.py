@@ -3,6 +3,7 @@ import json
 import os
 import re
 import time
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from dotenv import load_dotenv
@@ -83,8 +84,11 @@ def extract_icao_from_text(text: str) -> str | None:
     """
     if not text:
         return None
+    
+    text = text.upper()
     matches = re.findall(r"\b([A-Z]{4})\b", text)
     blacklist = {"ATCG", "MSFS"}  # add more if needed
+
     for code in matches:
         if code not in blacklist:
             return code
@@ -281,7 +285,7 @@ async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
     Fetch ICAOs from a Discord forum or text channel.
 
     For forum channels:
-      - each thread is treated as one airport
+      - each thread (active + archived) is treated as one airport
       - ICAO is taken from thread name or starter message
 
     For simple text channels:
@@ -306,6 +310,40 @@ async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
     client = discord.Client(intents=intents)
     result: dict[str, dict] = {}
 
+    async def handle_thread(thread: "discord.Thread") -> None:
+        """Extract ICAO from a single thread (title, then starter message)."""
+        icao = extract_icao_from_text(thread.name or "")
+
+        if icao is None and intents.message_content:
+            # fallback to starter message content if allowed
+            try:
+                starter = await thread.fetch_message(thread.id)
+                icao = extract_icao_from_text(starter.content or "")
+            except Exception:
+                icao = None
+
+        if not icao:
+            return
+
+        icao = icao.upper()
+
+        if thread.guild is None:
+            return
+
+        url = f"https://discord.com/channels/{thread.guild.id}/{thread.id}"
+
+        existing = result.get(icao)
+        created_ts = int(thread.created_at.timestamp())
+        if existing is None or created_ts > existing["created_ts"]:
+            result[icao] = {
+                "icao": icao,
+                "source": "discord",
+                "discord_thread": url,
+                "author": str(getattr(thread, "owner", None) or "Unknown"),
+                "created_ts": created_ts,
+            }
+            print(f"[INFO] Discord candidate {icao} from thread {thread.id}")
+
     @client.event
     async def on_ready():
         print(f"[INFO] Logged in as {client.user} (id={client.user.id})")
@@ -318,46 +356,35 @@ async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
 
         print(f"[INFO] Discord channel: {ch} (type={type(ch)})")
 
-        # Handle forum-like channels that have threads
-        # Active threads
-        threads = getattr(ch, "threads", [])
-        for thread in threads:
-            icao = extract_icao_from_text(thread.name)
-            if icao is None and intents.message_content:
-                # fallback to starter message content if allowed
-                try:
-                    starter = await thread.fetch_message(thread.id)
-                    icao = extract_icao_from_text(starter.content or "")
-                except Exception:
-                    icao = None
+        # Forum channel: active + archived threads
+        if isinstance(ch, discord.ForumChannel):
+            # Active threads
+            threads = list(getattr(ch, "threads", []))
+            print(f"[INFO] Forum active threads: {len(threads)}")
+            for thread in threads:
+                await handle_thread(thread)
 
-            if not icao:
-                continue
-
-            icao = icao.upper()
-            url = f"https://discord.com/channels/{thread.guild.id}/{thread.id}"
-
-            # Newest thread wins if duplicates exist
-            existing = result.get(icao)
-            created_ts = int(thread.created_at.timestamp())
-            if existing is None or created_ts > existing["created_ts"]:
-                result[icao] = {
-                    "icao": icao,
-                    "source": "discord",
-                    "discord_thread": url,
-                    "author": str(thread.owner or "Unknown"),
-                    "created_ts": created_ts,
-                }
-                print(f"[INFO] Discord candidate {icao} from thread {thread.id}")
-
-        # If it is a plain text channel, scan messages instead
-        if not threads:
+            # Archived threads
+            try:
+                archived_count = 0
+                async for thread in ch.archived_threads(limit=None):
+                    archived_count += 1
+                    await handle_thread(thread)
+                print(f"[INFO] Forum archived threads processed: {archived_count}")
+            except AttributeError:
+                print("[WARN] ForumChannel.archived_threads not available on this discord.py version.")
+        else:
+            # Plain text channel: scan message history
             async for message in ch.history(limit=None, oldest_first=True):
                 if message.author.bot:
                     continue
+                if message.guild is None:
+                    continue
+
                 icao = extract_icao_from_text(message.content or "")
                 if not icao:
                     continue
+
                 icao = icao.upper()
                 url = (
                     f"https://discord.com/channels/"
@@ -478,14 +505,18 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
     if run_steam == True:
         steam_new = fetch_steam_airports(existing_icaos)
         steam_icaos = set(steam_new.keys())
+        print(f"Steam Scraped. Found {len(steam_icaos)} new ICAOs.")
     else:
+        print("Steam Skipped.")
         steam_new = {}
         steam_icaos = set()
 
     # Step 2 - Discord (Steam wins on conflicts)
     if run_discord == True:
         discord_new = fetch_discord_airports(existing_icaos, steam_icaos)
+        print(f"Discord Scraped. Found {len(discord_new)} new ICAOs.")
     else:
+        print("Discord Skipped.")
         discord_new = {}
   
     # Step 3 - all new ICAOs that we need to call AeroDataBox for
@@ -507,7 +538,7 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
     new_airports: list[dict] = []
 
     for icao, info in sorted(new_all.items(), key=lambda kv: kv[0]):
-        if not use_aerodatabox:
+        if use_aerodatabox == False:
             print(
                 f"[WARN] Skipping AeroDataBox for {icao} because "
                 "use_aerodatabox=False."
@@ -598,6 +629,15 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
         f"[INFO] Updated {AIRPORTS_PATH} with {len(merged_airports)} airports. "
         f"lastUpdated={now_iso}"
     )
+
+     # Cleanup pycache
+    pycache_dir = ROOT / "scripts" / "__pycache__"
+    if pycache_dir.exists() and pycache_dir.is_dir():
+        try:
+            shutil.rmtree(pycache_dir)
+            print(f"[INFO] Removed {pycache_dir}")
+        except Exception as e:
+            print(f"[WARN] Failed to remove {pycache_dir}: {e}")
 
 
 if __name__ == "__main__":
