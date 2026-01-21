@@ -3,12 +3,10 @@ name: Update Airports (Daily)
 on:
   schedule:
     - cron: "0 0 * * *"   # once a day at 00:00 UTC
-  workflow_dispatch:        # manual trigger from Actions UI
+  workflow_dispatch:        # allow manual run from Actions tab
 
 permissions:
   contents: write      # allow committing/pushing
-  pages: write         # allow Pages deployment
-  id-token: write
 
 jobs:
   update:
@@ -65,23 +63,3 @@ jobs:
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Pages artifact
-        # Always upload so Pages can redeploy even if no new airports
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-          # If you ever move the site into a subfolder like "site/" or "docs/",
-          # change this path to that folder.
-
-  deploy:
-    needs: update
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
