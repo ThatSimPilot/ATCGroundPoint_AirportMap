@@ -76,8 +76,6 @@ This project is served via GitHub Pages.
 
 ## 📦 Future Roadmap
 Planned enhancements:
-- Automated Steam Workshop data ingestion
-- Automated Discord thread metadata ingestion
 - Contributor/author attribution
 - Region/country filtering
 - Status evolution history
