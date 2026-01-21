@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import sys
 import re
 import time
 import shutil
@@ -26,6 +27,9 @@ DATA_DIR = ROOT / "data"
 load_dotenv(ROOT / ".env")
 
 AIRPORTS_PATH = DATA_DIR / "airports.json"
+
+CACHE_DIR = ROOT / "cache" / "aerodatabox"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # Steam browse URL (most recent, ready-to-use items for appid 3239550)
 STEAM_BROWSE_BASE_URL = (
@@ -457,6 +461,32 @@ def fetch_discord_airports(existing_icaos: set[str],
     return filtered
 
 
+def cache_path_for_icao(icao: str) -> Path:
+    """Return the cache file path for a given ICAO."""
+    icao = icao.upper()
+    return CACHE_DIR / f"{icao}.json"
+
+
+def load_cached_airport(icao: str) -> dict | None:
+    """Load cached AeroDataBox response for an ICAO if present."""
+    path = cache_path_for_icao(icao)
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[WARN] Failed to read cache for {icao}: {e}")
+        return None
+
+
+def save_cached_airport(icao: str, data: dict) -> None:
+    """Save AeroDataBox response for an ICAO to cache."""
+    path = cache_path_for_icao(icao)
+    try:
+        path.write_text(json.dumps(data), encoding="utf-8")
+    except Exception as e:
+        print(f"[WARN] Failed to write cache for {icao}: {e}")
+
 # --------------------------------------------------------------------
 # AeroDataBox lookup
 # --------------------------------------------------------------------
@@ -467,6 +497,12 @@ def fetch_airport_from_aerodatabox(icao: str) -> dict:
             "APIMARKET_API_KEY is not set. Cannot call AeroDataBox."
         )
 
+    # Try cache first
+    cached = load_cached_airport(icao)
+    if cached is not None:
+        print(f"[INFO] Using cached AeroDataBox data for {icao}.")
+        return cached
+
     url = f"{APIMARKET_BASE_URL}/airports/icao/{icao}?withRunways=false&withTime=false"
     headers = {
         "accept": "application/json",
@@ -476,7 +512,12 @@ def fetch_airport_from_aerodatabox(icao: str) -> dict:
     print(f"[INFO] Calling AeroDataBox for {icao}...")
     resp = requests.get(url, headers=headers, timeout=20)
     resp.raise_for_status()
-    return resp.json()
+    data = resp.json()
+
+    # Save to cache for future runs
+    save_cached_airport(icao, data)
+
+    return data
 
 
 # --------------------------------------------------------------------
@@ -639,6 +680,17 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
         except Exception as e:
             print(f"[WARN] Failed to remove {pycache_dir}: {e}")
 
+
+if "--dry-detect" in sys.argv:
+    schema_version, base_airports, non_base_airports, existing_icaos = load_airports_state()
+    steam_new = fetch_steam_airports(existing_icaos)
+    discord_new = fetch_discord_airports(existing_icaos, set(steam_new.keys()))
+    new_count = len(steam_new) + len(discord_new)
+    print(f"Dry-detect new ICAOs: {new_count}")
+    for source, icaos in (("STEAM", steam_new), ("DISCORD", discord_new)):
+        for icao in sorted(icaos.keys()):
+            print(f" - [{source}] {icao}")
+    sys.exit(0)
 
 if __name__ == "__main__":
     main(use_aerodatabox=True)
