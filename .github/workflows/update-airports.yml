@@ -1,0 +1,87 @@
+name: Update Airports (Daily)
+
+on:
+  schedule:
+    - cron: "0 0 * * *"   # once a day at 00:00 UTC
+  workflow_dispatch:        # manual trigger from Actions UI
+
+permissions:
+  contents: write      # allow committing/pushing
+  pages: write         # allow Pages deployment
+  id-token: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install discord.py python-dotenv requests
+
+      - name: Detect new ICAOs (dry run, no APIMarket)
+        id: detect
+        env:
+          APIMARKET_API_KEY: ${{ secrets.APIMARKET_API_KEY }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+        run: |
+          echo "Running dry detection pass..."
+          python scripts/update_airports.py --dry-detect > detect.log
+
+          NEW_COUNT=$(grep -oP 'Dry-detect new ICAOs: \K\d+' detect.log || echo 0)
+          echo "new_count=$NEW_COUNT" >> $GITHUB_OUTPUT
+          echo "Detected $NEW_COUNT new ICAOs"
+
+      - name: Run full update (APIMarket enabled)
+        if: steps.detect.outputs.new_count != '0'
+        env:
+          APIMARKET_API_KEY: ${{ secrets.APIMARKET_API_KEY }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+        run: |
+          echo "New ICAOs detected - running full update..."
+          python scripts/update_airports.py
+
+      - name: Commit changes
+        if: steps.detect.outputs.new_count != '0'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add data/airports.json || true
+          git commit -m "Daily update: $(date -u +%Y-%m-%d) (new airports)" || echo "No changes to commit"
+
+      - name: Push changes
+        if: steps.detect.outputs.new_count != '0'
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Pages artifact
+        # Always upload so Pages can redeploy even if no new airports
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+          # If you ever move the site into a subfolder like "site/" or "docs/",
+          # change this path to that folder.
+
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
