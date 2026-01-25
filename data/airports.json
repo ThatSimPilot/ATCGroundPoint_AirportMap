@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-01-21T06:21:25.142361+00:00",
+  "lastUpdated": "2026-01-25T01:09:31.567773+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -465,6 +465,20 @@
       "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3583769291",
       "discordThread": null,
       "lastUpdated": "2025-10-09T18:42:06+00:00",
+      "defaultIncluded": false,
+      "featured": false
+    },
+    {
+      "icao": "KATL",
+      "name": "Atlanta Hartsfield Jackson Airport",
+      "lat": 33.6367,
+      "lng": -84.4281,
+      "status": "released",
+      "source": "steam",
+      "author": "76561199024580125",
+      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3650477784",
+      "discordThread": null,
+      "lastUpdated": "2026-01-22T17:55:33+00:00",
       "defaultIncluded": false,
       "featured": false
     },
@@ -1123,6 +1137,20 @@
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1410962669682557008",
       "lastUpdated": "2026-01-21T06:21:24.641552+00:00",
+      "defaultIncluded": false,
+      "featured": false
+    },
+    {
+      "icao": "ZHHH",
+      "name": "Wuhan Tianhe Airport",
+      "lat": 30.7838,
+      "lng": 114.208,
+      "status": "in_dev",
+      "source": "discord",
+      "author": "Unknown",
+      "workshopUrl": null,
+      "discordThread": "https://discord.com/channels/1312377412251680858/1464721940252987473",
+      "lastUpdated": "2026-01-25T01:09:31.067588+00:00",
       "defaultIncluded": false,
       "featured": false
     },
