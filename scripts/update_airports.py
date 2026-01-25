@@ -59,6 +59,23 @@ DISCORD_CHANNEL_ID = os.environ.get("DISCORD_CHANNEL_ID")
 # Utility helpers
 # --------------------------------------------------------------------
 
+def check_json_exists(path: Path = AIRPORTS_PATH):
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    if path.exists():
+        print("[INFO] airports.json exists. Continuing.")
+        return
+    
+    base_path = DATA_DIR / "baseAirports.json"
+    if not base_path.exists() and not path.exists():
+        print("[ERROR] baseAirports.json does not exist in data/. Cannot create airports.json")
+        sys.exit(1)
+
+    print("[ERROR] airports.json does not exist in data/. Creating.")
+    shutil.copyfile(base_path, path)
+    print("[INFO] Created airports.json from baseAirports.json.")
+        
+
 def read_json(path: Path, fallback):
     if not path.exists():
         print(f"[WARN] {path} does not exist, using fallback.")
@@ -525,6 +542,7 @@ def fetch_airport_from_aerodatabox(icao: str) -> dict:
 # --------------------------------------------------------------------
 
 def main(run_steam=True, run_discord=True, use_aerodatabox=True):
+    check_json_exists()
     """
     Master pipeline:
 
@@ -682,6 +700,7 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
 
 
 if "--dry-detect" in sys.argv:
+    check_json_exists()
     schema_version, base_airports, non_base_airports, existing_icaos = load_airports_state()
     steam_new = fetch_steam_airports(existing_icaos)
     discord_new = fetch_discord_airports(existing_icaos, set(steam_new.keys()))
