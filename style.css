@@ -50,6 +50,36 @@ main > .container-fluid {
   background: #020617;
 }
 
+.footer-content {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.footer-updated {
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.db-updated-text {
+  display: none;
+}
+
+.footer-updated .db-updated-text:first-of-type {
+  display: inline;
+}
+
+.footer-updated:hover .db-updated-text:first-of-type {
+  display: none;
+}
+
+.footer-updated:hover .db-updated-text:last-of-type {
+  display: inline;
+}
+
 /* Main layout: sidebar + separator + globe */
 .main-layout {
   display: flex;
@@ -102,6 +132,18 @@ main > .container-fluid {
   display: flex;
   align-items: center;      /* vertical center */
   justify-content: center;  /* horizontal center */
+}
+
+#bmc-widget-container {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 6;
+}
+
+#bmc-widget-container #bmc-wbtn,
+#bmc-widget-container .bmc-btn-container {
+  position: static !important;
 }
 
 /* Make sure #globe itself can flex and shrink with the wrapper */

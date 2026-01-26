@@ -333,15 +333,24 @@ async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
 
     async def handle_thread(thread: "discord.Thread") -> None:
         """Extract ICAO from a single thread (title, then starter message)."""
+        starter_message = None
+
+        async def fetch_starter_message():
+            nonlocal starter_message
+            if starter_message is None:
+                try:
+                    starter_message = await thread.fetch_message(thread.id)
+                except Exception:
+                    starter_message = False
+            return starter_message if starter_message is not False else None
+
         icao = extract_icao_from_text(thread.name or "")
 
         if icao is None and intents.message_content:
             # fallback to starter message content if allowed
-            try:
-                starter = await thread.fetch_message(thread.id)
+            starter = await fetch_starter_message()
+            if starter is not None:
                 icao = extract_icao_from_text(starter.content or "")
-            except Exception:
-                icao = None
 
         if not icao:
             return
@@ -353,6 +362,17 @@ async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
 
         url = f"https://discord.com/channels/{thread.guild.id}/{thread.id}"
 
+        author_name = "Unknown"
+        owner = getattr(thread, "owner", None)
+        if owner is not None and getattr(owner, "name", None):
+            author_name = owner.name
+        else:
+            starter = await fetch_starter_message()
+            if starter is not None and getattr(starter, "author", None):
+                author_name = getattr(starter.author, "name", None) or str(
+                    starter.author
+                )
+
         existing = result.get(icao)
         created_ts = int(thread.created_at.timestamp())
         if existing is None or created_ts > existing["created_ts"]:
@@ -360,7 +380,7 @@ async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
                 "icao": icao,
                 "source": "discord",
                 "discord_thread": url,
-                "author": str(getattr(thread, "owner", None) or "Unknown"),
+                "author": author_name,
                 "created_ts": created_ts,
             }
             print(f"[INFO] Discord candidate {icao} from thread {thread.id}")

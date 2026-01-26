@@ -152,6 +152,8 @@
                     </a>
                   </div>
                 </div>
+
+                <div id="bmc-widget-container" aria-hidden="true"></div>
               </div>
             </div>
           </section>
@@ -162,7 +164,18 @@
     <!-- Footer -->
     <footer class="py-2 bg-footer text-light small footer-bar border-top">
       <div class="container-fluid px-3">
-        ATC Ground Point | Community airport overview
+        <div class="footer-content">
+          <span>ATC Ground Point | Community airport overview</span>
+          <span class="footer-updated">
+            Database updated:
+            <span id="database-updated-utc" class="db-updated-text"
+              >Loading...</span
+            >
+            <span id="database-updated-local" class="db-updated-text"
+              >Loading...</span
+            >
+          </span>
+        </div>
       </div>
     </footer>
 

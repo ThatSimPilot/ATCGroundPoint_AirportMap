@@ -84,6 +84,108 @@ function statusLabel(status) {
   return status || "Unknown";
 }
 
+function normalizeIsoTimestamp(value) {
+  if (!value) return null;
+  const text = String(value).trim();
+  const match = text.match(/^(.+?)(\.\d+)?(Z|[+-]\d{2}:\d{2})$/);
+  if (!match) return text;
+  const base = match[1];
+  let fraction = match[2] || "";
+  const tz = match[3];
+
+  if (fraction.length > 4) {
+    fraction = fraction.slice(0, 4);
+  }
+
+  return `${base}${fraction}${tz}`;
+}
+
+function formatDatabaseUpdated(value) {
+  if (!value) return "Unknown";
+  const normalized = normalizeIsoTimestamp(value);
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return formatWithDayPeriodUpper(date, undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short"
+  });
+}
+
+function formatDatabaseUpdatedLocal(value) {
+  if (!value) return "Unknown";
+  const normalized = normalizeIsoTimestamp(value);
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const useEnAu = typeof timeZone === "string" && timeZone.startsWith("Australia/");
+  const locale = useEnAu ? "en-AU" : undefined;
+
+  return formatWithDayPeriodUpper(date, locale, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short"
+  });
+}
+
+function formatWithDayPeriodUpper(date, locale, options) {
+  const formatter = new Intl.DateTimeFormat(locale, options);
+  const parts = formatter.formatToParts(date);
+  const tokens = new Map();
+
+  for (const part of parts) {
+    if (!tokens.has(part.type)) {
+      tokens.set(part.type, part.value);
+    }
+  }
+
+  const month = tokens.get("month") || "";
+  const day = tokens.get("day") || "";
+  const year = tokens.get("year") || "";
+  const hour = tokens.get("hour") || "";
+  const minute = tokens.get("minute") || "";
+  const dayPeriod = tokens.get("dayPeriod")
+    ? tokens.get("dayPeriod").toUpperCase()
+    : "";
+  const timeZoneName = tokens.get("timeZoneName") || "";
+
+  const timeParts = [hour, minute].filter(Boolean);
+  const time = timeParts.length ? timeParts.join(":") : "";
+  const timeWithPeriod = [time, dayPeriod].filter(Boolean).join(" ");
+  const timeWithZone = [timeWithPeriod, timeZoneName].filter(Boolean).join(" ");
+  const datePart = [month, day].filter(Boolean).join(" ").trim();
+  const dateWithYear = [datePart, year].filter(Boolean).join(", ").trim();
+
+  if (dateWithYear && timeWithZone) {
+    return `${dateWithYear}, ${timeWithZone}`;
+  }
+  return dateWithYear || timeWithZone || "Unknown";
+}
+
+function relocateBmcWidget() {
+  const container = document.getElementById("bmc-widget-container");
+  if (!container) return false;
+
+  const widget =
+    document.getElementById("bmc-wbtn") ||
+    document.querySelector(".bmc-btn-container");
+
+  if (!widget) return false;
+
+  if (widget.parentElement !== container) {
+    container.appendChild(widget);
+  }
+
+  return true;
+}
+
 // ---------- Resize Globe Helper ----------
 
 function syncGlobeToContainerSize() {
@@ -427,11 +529,17 @@ async function init() {
   createGlobe(filteredAirports);
   renderAirportList(filteredAirports);
 
-  // (Optional) if you want to show lastUpdated somewhere later:
-  // const lastUpdatedEl = document.getElementById("last-updated");
-  // if (lastUpdatedEl && data.lastUpdated) {
-  //   lastUpdatedEl.textContent = data.lastUpdated;
-  // }
+  const dbUpdatedUtcEl = document.getElementById("database-updated-utc");
+  const dbUpdatedLocalEl = document.getElementById("database-updated-local");
+  const localLabel = formatDatabaseUpdatedLocal(data.lastUpdated);
+
+  if (dbUpdatedUtcEl) {
+    dbUpdatedUtcEl.textContent = formatDatabaseUpdated(data.lastUpdated);
+  }
+
+  if (dbUpdatedLocalEl) {
+    dbUpdatedLocalEl.textContent = localLabel;
+  }
 
   // Restore filters from localStorage, then apply them
   loadFilterState();
@@ -447,6 +555,14 @@ async function init() {
   if (searchInput) searchInput.addEventListener("input", applyFilters);
 
   applyFilters();
+
+  let attempts = 0;
+  const widgetTimer = setInterval(() => {
+    attempts += 1;
+    if (relocateBmcWidget() || attempts >= 20) {
+      clearInterval(widgetTimer);
+    }
+  }, 250);
 }
 
 window.addEventListener("load", init);
