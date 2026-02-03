@@ -5,12 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ATC Ground Point Airports</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/ico" sizes="64x64" href="assets/favicon.ico" />
+
     <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
 
     <!-- Custom CSS -->
@@ -39,9 +48,9 @@
         <div id="main-layout" class="main-layout">
           <!-- Sidebar -->
           <aside id="sidebar" class="sidebar d-flex flex-column rounded-3 p-3">
-            <section class="mb-3">
+            <section class="sidebar-block">
               <!-- Filters -->
-              <h2 class="h6 mb-2">Filters</h2>
+              <h2 class="h6 mb-2 filters">Filters</h2>
               <div class="form-check small mb-1">
                 <input
                   class="form-check-input"
@@ -77,8 +86,8 @@
               </div>
             </section>
 
-            <section class="mb-3">
-              <h2 class="h6 mb-2">Legend</h2>
+            <section class="sidebar-block">
+              <h2 class="h6 mb-2 legend">Legend</h2>
               <div class="legend-item">
                 <span class="legend-dot legend-base"></span>
                 <span class="small">Base</span>
@@ -94,15 +103,20 @@
             </section>
 
             <section
-              class="airport-list flex-grow-1 d-flex flex-column min-h-0"
+              class="sidebar-block sidebar-block-last airport-list flex-grow-1 d-flex flex-column min-h-0"
             >
-              <h2 class="h6 mb-2">Airports</h2>
-              <input
-                type="text"
-                id="search"
-                class="form-control form-control-sm mb-2"
-                placeholder="🔎 Search by ICAO or name"
-              />
+              <h2 class="h6 mb-2 airports">Airports</h2>
+              <div class="input-group input-group-sm mb-2 airport-search">
+                <span class="input-group-text">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  id="search"
+                  class="form-control"
+                  placeholder="Search by ICAO or name"
+                />
+              </div>
               <ul
                 id="airport-list"
                 class="list-unstyled flex-grow-1 overflow-auto mb-0"

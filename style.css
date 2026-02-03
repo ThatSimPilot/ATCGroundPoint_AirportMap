@@ -93,9 +93,29 @@ main > .container-fluid {
   flex: 0 0 280px; /* fixed width */
   max-width: 280px;
   min-width: 280px;
+  min-height: 0; /* critical to avoid extra page height */
   background: #020617;
   border: 1px solid rgba(148, 163, 184, 0.25);
   color: #e5e7eb;
+}
+
+/* Sidebar section separators */
+.sidebar-block {
+  padding-bottom: 0.8rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(
+      to right,
+      transparent,
+      rgba(148, 163, 184, 0.30),
+      transparent
+    ) 1;
+}
+
+.sidebar-block-last {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
 }
 
 
@@ -161,12 +181,33 @@ main > .container-fluid {
   display: block;
 }
 
+
 /* Sidebar text + inputs on dark */
 .sidebar h2,
 .sidebar label,
 .sidebar .small {
   color: #e5e7eb;
 }
+
+.sidebar h2 {
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.sidebar h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  bottom: 0.15rem;
+  width: 3px;
+  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.6);
+}
+
+.sidebar h2.filters::before { background: #60a5fa; }
+.sidebar h2.legend::before { background: #f6ad55; }
+.sidebar h2.airports::before { background: #48bb78; }
 
 /* Make the checkboxes easier to see on dark */
 .sidebar .form-check-input {
@@ -188,6 +229,46 @@ main > .container-fluid {
   color: #64748b;
 }
 
+/* ---------- Airport list scrollbar ---------- */
+/* Firefox */
+#airport-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(2, 6, 23, 0.35);
+}
+
+/* Chromium / Edge / Safari */
+#airport-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+#airport-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin: 6px 0; /* gives top/bottom breathing room */
+}
+
+#airport-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+
+  /* makes thumb look slimmer and more “pill” */
+  border: 2px solid rgba(2, 6, 23, 0.55);
+  background-clip: padding-box;
+}
+
+#airport-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+#airport-list::-webkit-scrollbar-thumb:active {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* Optional: reduce harsh corner on Windows overlay scrollbars */
+#airport-list {
+  scrollbar-gutter: stable;
+}
+
 /* Legend */
 .legend-item {
   display: flex;
@@ -200,6 +281,12 @@ main > .container-fluid {
   width: 10px;
   height: 10px;
   border-radius: 999px;
+
+  display: inline-block;
+  flex: 0 0 10px;
+  min-width: 10px;
+  min-height: 10px;
+  align-self: center;
 }
 
 .legend-base {
@@ -215,6 +302,36 @@ main > .container-fluid {
   background: #48bb78;
 }
 
+/* Airport search bar */
+.airport-search .form-control {
+  background: rgba(15, 23, 42, 0.85); /* lighter than sidebar */
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  color: #f8fafc;
+}
+
+.airport-search .form-control::placeholder {
+  color: #cbd5f5;
+}
+
+/* Icon container */
+.airport-search .input-group-text {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  color: #e5e7eb;
+}
+
+/* Focus state */
+.airport-search .form-control:focus {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 0.15rem rgba(96, 165, 250, 0.25);
+}
+
+.airport-search .form-control,
+.airport-search .input-group-text {
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
 /* Airport list */
 .airport-list {
   min-height: 0;
@@ -224,19 +341,62 @@ main > .container-fluid {
   padding-right: 0.25rem;
 }
 
+#airport-list .airport-item {
+  margin-bottom: 0.35rem;
+}
+
+#airport-list .airport-item:last-child {
+  margin-bottom: 0;
+}
+
 .airport-item {
-  padding: 0.4rem 0.35rem;
-  border-radius: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.55rem;
   cursor: pointer;
   font-size: 0.85rem;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   color: #e5e7eb;
+
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(2, 6, 23, 0.4);
+
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.02),
+    0 4px 10px rgba(0, 0, 0, 0.25);
+
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .airport-item:hover {
   background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.22);
+
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.airport-item.is-selected {
+  background: rgba(96, 165, 250, 0.14);
+  border-color: rgba(96, 165, 250, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.airport-item.is-selected .airport-title {
+  color: #f8fafc;
+}
+
+.airport-item.is-selected .airport-name {
+  color: rgba(226, 232, 240, 0.9);
 }
 
 .airport-title {

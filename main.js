@@ -10,6 +10,7 @@ let allAirports = [];
 let filteredAirports = [];
 let globeInstance = null;
 let globeResizeObserver = null;
+let selectedAirportIcao = null;
 
 const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
 
@@ -316,6 +317,30 @@ function updateGlobePoints(airports) {
     .pointColor(d => STATUS_COLORS[d.status] || "#e5e7eb");
 }
 
+function setSelectedAirport(icao, { scroll = false } = {}) {
+  selectedAirportIcao = (icao || "").toUpperCase() || null;
+  updateSelectedAirportInList({ scroll });
+}
+
+function updateSelectedAirportInList({ scroll = false } = {}) {
+  const listEl = document.getElementById("airport-list");
+  if (!listEl) return;
+
+  const items = listEl.querySelectorAll(".airport-item");
+  items.forEach(el => {
+    const elIcao = (el.dataset.icao || "").toUpperCase();
+    el.classList.toggle("is-selected", !!selectedAirportIcao && elIcao === selectedAirportIcao);
+  });
+
+  if (scroll && selectedAirportIcao) {
+    const active = listEl.querySelector(`.airport-item[data-icao="${selectedAirportIcao}"]`);
+    if (active) active.scrollIntoView({
+      block: "center",
+      behavior: "smooth"
+    });
+  }
+}
+
 function renderAirportList(airports) {
   const listEl = document.getElementById("airport-list");
   if (!listEl) return;
@@ -328,6 +353,7 @@ function renderAirportList(airports) {
     .forEach(a => {
       const li = document.createElement("li");
       li.className = "airport-item";
+      li.dataset.icao = (a.icao || "").toUpperCase();
 
       const left = document.createElement("div");
       const title = document.createElement("div");
@@ -355,15 +381,25 @@ function renderAirportList(airports) {
       li.appendChild(left);
       li.appendChild(dot);
 
+      if (selectedAirportIcao && (a.icao || "").toUpperCase() === selectedAirportIcao) {
+        li.classList.add("is-selected");
+      }
+
       // List click behaves like marker click
-      li.addEventListener("click", () => focusOnAirport(a));
+      li.addEventListener("click", () => {
+        setSelectedAirport(a.icao); // no scroll
+        focusOnAirport(a);
+      });
 
       listEl.appendChild(li);
     });
+    updateSelectedAirportInList();
 }
 
 function focusOnAirport(airport) {
   if (!globeInstance || !airport) return;
+
+  setSelectedAirport(airport.icao, { scroll: true });
 
   globeInstance.pointOfView(
     {
@@ -514,6 +550,14 @@ function applyFilters() {
 
   updateGlobePoints(filteredAirports);
   renderAirportList(filteredAirports);
+
+  if (selectedAirportIcao) {
+    const stillVisible = filteredAirports.some(
+      a => (a.icao || "").toUpperCase() === selectedAirportIcao
+    );
+  if (!stillVisible) selectedAirportIcao = null;
+  }
+  updateSelectedAirportInList();
 
   saveFilterState();
 }
