@@ -1141,20 +1141,6 @@
       "featured": false
     },
     {
-      "icao": "YBWW",
-      "name": "Wellcamp Brisbane West Airport",
-      "lat": -27.558332,
-      "lng": 151.79333,
-      "status": "in_dev",
-      "source": "discord",
-      "author": "thatsimpilot_",
-      "workshopUrl": null,
-      "discordThread": "https://discord.com/channels/1312377412251680858/1467380778148171829",
-      "lastUpdated": "2026-02-02T01:16:48.580885+00:00",
-      "defaultIncluded": false,
-      "featured": false
-    },
-    {
       "icao": "YPPH",
       "name": "Perth International Airport",
       "lat": -31.940277,
