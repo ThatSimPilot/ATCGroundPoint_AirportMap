@@ -1,3 +1,7 @@
+/* =======================================================================
+   Base / Page
+   ======================================================================= */
+
 /* General */
 html,
 body {
@@ -32,6 +36,11 @@ main > .container-fluid {
   flex-direction: column;
 }
 
+
+/* =======================================================================
+   Header / Footer
+   ======================================================================= */
+
 /* Header / footer borders – darker so they don't look like white gaps */
 .header-bar {
   --bs-border-color: rgba(15, 23, 42, 0.9);
@@ -50,6 +59,7 @@ main > .container-fluid {
   background: #020617;
 }
 
+/* Footer layout + updated text hover swap */
 .footer-content {
   display: flex;
   gap: 0.75rem;
@@ -80,13 +90,22 @@ main > .container-fluid {
   display: inline;
 }
 
-/* Main layout: sidebar + separator + globe */
+
+/* =======================================================================
+   Main Layout (Sidebar + Globe)
+   ======================================================================= */
+
 .main-layout {
   display: flex;
   flex-direction: row;
   flex: 1 1 auto;
   min-height: 0; /* critical to avoid extra page height */
 }
+
+
+/* =======================================================================
+   Sidebar
+   ======================================================================= */
 
 /* Sidebar with fixed width */
 #sidebar {
@@ -118,70 +137,6 @@ main > .container-fluid {
   border-bottom: 0;
 }
 
-
-/* Globe column takes remaining space */
-.globe-column {
-  flex: 1 1 auto;
-  display: flex;
-  background: #020617;
-  min-width: 0;
-}
-
-/* Globe fills remaining area */
-.globe-inner {
-  flex: 1;
-  display: flex;
-  justify-content: stretch;
-  align-items: stretch;
-  padding-left: 8px;
-  padding-right: 8px;
-  min-width: 0;
-}
-
-.globe-wrapper {
-  flex: 1 1 auto;
-  width: 100%;
-  height: 100%;
-  min-height: 0; /* or keep a small min-height if you like, see note below */
-  background: #020617;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  overflow: hidden;
-  position: relative;
-
-  /* Center the globe area inside this wrapper */
-  display: flex;
-  align-items: center;      /* vertical center */
-  justify-content: center;  /* horizontal center */
-}
-
-#bmc-widget-container {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  z-index: 6;
-}
-
-#bmc-widget-container #bmc-wbtn,
-#bmc-widget-container .bmc-btn-container {
-  position: static !important;
-}
-
-/* Make sure #globe itself can flex and shrink with the wrapper */
-#globe {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-}
-
-/* And keep the canvas matching the container */
-#globe canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
-
 /* Sidebar text + inputs on dark */
 .sidebar h2,
 .sidebar label,
@@ -189,6 +144,7 @@ main > .container-fluid {
   color: #e5e7eb;
 }
 
+/* Section heading accents */
 .sidebar h2 {
   position: relative;
   padding-left: 0.5rem;
@@ -229,47 +185,11 @@ main > .container-fluid {
   color: #64748b;
 }
 
-/* ---------- Airport list scrollbar ---------- */
-/* Firefox */
-#airport-list {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(2, 6, 23, 0.35);
-}
 
-/* Chromium / Edge / Safari */
-#airport-list::-webkit-scrollbar {
-  width: 8px;
-}
+/* =======================================================================
+   Legend
+   ======================================================================= */
 
-#airport-list::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 999px;
-  margin: 6px 0; /* gives top/bottom breathing room */
-}
-
-#airport-list::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
-  border-radius: 999px;
-
-  /* makes thumb look slimmer and more “pill” */
-  border: 2px solid rgba(2, 6, 23, 0.55);
-  background-clip: padding-box;
-}
-
-#airport-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.55);
-}
-
-#airport-list::-webkit-scrollbar-thumb:active {
-  background: rgba(148, 163, 184, 0.7);
-}
-
-/* Optional: reduce harsh corner on Windows overlay scrollbars */
-#airport-list {
-  scrollbar-gutter: stable;
-}
-
-/* Legend */
 .legend-item {
   display: flex;
   align-items: center;
@@ -291,7 +211,6 @@ main > .container-fluid {
 
 .legend-base {
   background: #a0aec0;
-  
 }
 
 .legend-in_dev {
@@ -301,6 +220,11 @@ main > .container-fluid {
 .legend-released {
   background: #48bb78;
 }
+
+
+/* =======================================================================
+   Airport Search + Airport List
+   ======================================================================= */
 
 /* Airport search bar */
 .airport-search .form-control {
@@ -332,7 +256,7 @@ main > .container-fluid {
   transition: background 120ms ease, border-color 120ms ease;
 }
 
-/* Airport list */
+/* Airport list container */
 .airport-list {
   min-height: 0;
 }
@@ -349,6 +273,7 @@ main > .container-fluid {
   margin-bottom: 0;
 }
 
+/* Airport item card */
 .airport-item {
   padding: 0.45rem 0.5rem;
   border-radius: 0.55rem;
@@ -414,6 +339,7 @@ main > .container-fluid {
   color: #cbd5f5;
 }
 
+/* Status pills */
 .status-pill {
   font-size: 0.7rem;
   padding: 0.1rem 0.45rem;
@@ -432,6 +358,66 @@ main > .container-fluid {
 .status-released {
   background: rgba(72, 187, 120, 0.18);
 }
+
+
+/* =======================================================================
+   Globe Area
+   ======================================================================= */
+
+/* Globe column takes remaining space */
+.globe-column {
+  flex: 1 1 auto;
+  display: flex;
+  background: #020617;
+  min-width: 0;
+}
+
+/* Globe fills remaining area */
+.globe-inner {
+  flex: 1;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  padding-left: 8px;
+  padding-right: 8px;
+  min-width: 0;
+}
+
+.globe-wrapper {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0; /* or keep a small min-height if you like, see note below */
+  background: #020617;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  overflow: hidden;
+  position: relative;
+
+  /* Center the globe area inside this wrapper */
+  display: flex;
+  align-items: center;      /* vertical center */
+  justify-content: center;  /* horizontal center */
+}
+
+/* Make sure #globe itself can flex and shrink with the wrapper */
+#globe {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* And keep the canvas matching the container */
+#globe canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+
+/* =======================================================================
+   Overlays / Widgets
+   ======================================================================= */
 
 .airport-details-card {
   position: absolute;
@@ -465,6 +451,68 @@ main > .container-fluid {
   opacity: 0.5;
   text-decoration: none;
 }
+
+/* Buy Me a Coffee widget placement */
+#bmc-widget-container {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 6;
+}
+
+#bmc-widget-container #bmc-wbtn,
+#bmc-widget-container .bmc-btn-container {
+  position: static !important;
+}
+
+
+/* =======================================================================
+   Airport list scrollbar
+   ======================================================================= */
+
+/* Firefox */
+#airport-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(2, 6, 23, 0.35);
+}
+
+/* Chromium / Edge / Safari */
+#airport-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+#airport-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin: 6px 0; /* gives top/bottom breathing room */
+}
+
+#airport-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+
+  /* makes thumb look slimmer and more “pill” */
+  border: 2px solid rgba(2, 6, 23, 0.55);
+  background-clip: padding-box;
+}
+
+#airport-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+#airport-list::-webkit-scrollbar-thumb:active {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* Optional: reduce harsh corner on Windows overlay scrollbars */
+#airport-list {
+  scrollbar-gutter: stable;
+}
+
+
+/* =======================================================================
+   Responsive
+   ======================================================================= */
 
 /* Responsive: stack vertically on small screens, no separator */
 @media (max-width: 767.98px) {

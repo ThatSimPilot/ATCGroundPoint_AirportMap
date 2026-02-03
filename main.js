@@ -11,8 +11,16 @@ let filteredAirports = [];
 let globeInstance = null;
 let globeResizeObserver = null;
 let selectedAirportIcao = null;
+let showClusters = false;
+let currentClusterRes = null;
+let zoomRafPending = false;
+let lastZoomAltitude = null;
 
 const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
+
+
+const CLUSTER_ALTITUDE_ON = 1.55;  // start clustering above this
+const CLUSTER_ALTITUDE_OFF = 1.35; // stop clustering below this (hysteresis)
 
 // Auto-rotate / interaction pause state
 let orbitControls = null;
@@ -258,6 +266,146 @@ function pauseAutoRotate(delay = 5000) {
   }, delay);
 }
 
+// ---------- Marker Clusterin Helpers ----------
+
+function getH3ResolutionForAltitude(altitude) {
+  // You can tweak these cutoffs to taste.
+  if (altitude > 2.3) return 1;
+  if (altitude > 1.8) return 2;
+  if (altitude > 1.7) return 3;
+  if (altitude > 1.45) return 4;
+  return 5;
+}
+
+function dominantStatusColor(counts) {
+  // counts: { base: n, in_dev: n, released: n }
+  const base = counts.base || 0;
+  const inDev = counts.in_dev || 0;
+  const released = counts.released || 0;
+
+  if (released >= inDev && released >= base) return STATUS_COLORS.released;
+  if (inDev >= released && inDev >= base) return STATUS_COLORS.in_dev;
+  return STATUS_COLORS.base;
+}
+
+function buildClusters(airports, h3Res) {
+  const buckets = new Map();
+
+  for (const a of airports) {
+    if (typeof a.lat !== "number" || typeof a.lng !== "number") continue;
+
+    const idx = window.h3.latLngToCell(a.lat, a.lng, h3Res);
+
+    let b = buckets.get(idx);
+    if (!b) {
+      b = { id: idx, airports: [] };
+      buckets.set(idx, b);
+    }
+    b.airports.push(a);
+  }
+
+  const clustered = [];
+  const singles = [];
+
+  for (const b of buckets.values()) {
+    if (b.airports.length === 1) {
+      // Keep the real airport marker (no “fake cluster” objects)
+      singles.push(b.airports[0]);
+      continue;
+    }
+
+    // True cluster (2+)
+    let latSum = 0;
+    let lngSum = 0;
+    const counts = { base: 0, in_dev: 0, released: 0 };
+
+    for (const a of b.airports) {
+      latSum += a.lat;
+      lngSum += a.lng;
+      const st = a.status || "base";
+      if (counts[st] !== undefined) counts[st] += 1;
+    }
+
+    const lat = latSum / b.airports.length;
+    const lng = lngSum / b.airports.length;
+
+    clustered.push({
+      id: b.id,
+      isCluster: true,
+      count: b.airports.length,
+      lat,
+      lng,
+      statusCounts: counts,
+      color: dominantStatusColor(counts)
+    });
+  }
+
+  return { clustered, singles };
+}
+
+function clusterRadius(count) {
+  // Much thicker base + slower growth so small clusters are still chunky
+  const base = 0.34; // was ~0.26
+  const growth = Math.log2(Math.max(1, count)) * 0.14;
+  return Math.min(1.1, base + growth);
+}
+
+function updateClusterModeForAltitude(altitude) {
+  const shouldCluster = showClusters
+    ? altitude > CLUSTER_ALTITUDE_OFF
+    : altitude > CLUSTER_ALTITUDE_ON;
+
+  if (shouldCluster === showClusters) return;
+  showClusters = shouldCluster;
+
+  refreshMarkersForCurrentMode(altitude);
+}
+
+function refreshMarkersForCurrentMode(
+  altitude = globeInstance?.pointOfView()?.altitude ?? 2.5
+) {
+  if (!globeInstance) return;
+
+  // If clustering is on but H3 isn't loaded, fall back
+  if (showClusters && (!window.h3 || typeof window.h3.latLngToCell !== "function")) {
+    console.warn("H3 not loaded. Falling back to normal markers.");
+    showClusters = false;
+  }
+
+  if (!showClusters) {
+    currentClusterRes = null;
+
+    globeInstance
+      .pointsData(filteredAirports)
+      .pointColor(d => STATUS_COLORS[d.status] || "#e5e7eb")
+      .pointRadius(() => 0.18)
+      .pointAltitude(() => 0.015)
+      .labelsData([]);
+
+    return;
+  }
+
+  const h3Res = getH3ResolutionForAltitude(altitude);
+  currentClusterRes = h3Res;
+
+  const { clustered, singles } = buildClusters(filteredAirports, h3Res);
+  const data = clustered.concat(singles);
+
+  globeInstance
+    .pointsData(data)
+    .pointColor(d => (d.isCluster ? (d.color || "#93c5fd") : (STATUS_COLORS[d.status] || "#e5e7eb")))
+    .pointRadius(d => (d.isCluster ? clusterRadius(d.count) : 0.18))
+    .pointAltitude(d => (d.isCluster ? 0.03 : 0.015)) // clusters sit a bit “above” singles
+    .labelsData(clustered)
+    .labelLat(d => d.lat)
+    .labelLng(d => d.lng)
+    .labelText(d => String(d.count))
+    .labelSize(d => (d.count >= 25 ? 0.23 : 0.20)) // slightly bigger for large clusters
+    .labelDotRadius(() => 0)
+    .labelColor(() => "#f8fafc")
+    .labelResolution(() => 2);
+}
+
 // ---------- Globe ----------
 
 function createGlobe(airports) {
@@ -280,6 +428,7 @@ function createGlobe(airports) {
     .pointAltitude(() => 0.015)
     .pointRadius(() => 0.18)
     .pointLabel(d => {
+      if (d && d.isCluster) return `Cluster: ${d.count} airports`;
       const icao = d.icao || "N/A";
       const name = d.name || "Unknown";
       const status = statusLabel(d.status);
@@ -287,9 +436,24 @@ function createGlobe(airports) {
     })
     // Make markers behave like list clicks
     .onPointClick(point => {
-      if (point) {
-        focusOnAirport(point);
+      if (!point) return;
+
+      // Cluster click: zoom in and let clusters dissolve naturally
+      if (point.isCluster) {
+        const current = globeInstance.pointOfView();
+        const nextAlt = Math.max(0.9, (current?.altitude ?? 2.5) * 0.65);
+
+        globeInstance.pointOfView(
+          { lat: point.lat, lng: point.lng, altitude: nextAlt },
+          900
+        );
+
+        pauseAutoRotate(6000);
+        return;
       }
+
+      // Normal airport click
+      focusOnAirport(point);
     })
      .onGlobeReady(() => {
       const controls = globeInstance.controls();
@@ -300,9 +464,42 @@ function createGlobe(airports) {
         // Hook pause/resume on user interaction
         setupAutoRotateInteraction(controls);
       }
-
+      
       // Sync size and keep globe centered within its section
       setupGlobeResizeHandling();
+      
+      // Initial cluster mode setup
+      globeInstance.onZoom(pov => {
+        lastZoomAltitude = pov?.altitude ?? globeInstance.pointOfView().altitude;
+
+        // Throttle heavy recompute to animation frames
+        if (zoomRafPending) return;
+        zoomRafPending = true;
+
+        requestAnimationFrame(() => {
+          zoomRafPending = false;
+
+          const alt = lastZoomAltitude ?? 2.5;
+
+          // This may flip showClusters on/off (and calls refresh if the mode changed)
+          const wasClusters = showClusters;
+          updateClusterModeForAltitude(alt);
+
+          // If we are in cluster mode, rebuild when the H3 res changes (or if we just entered)
+          if (showClusters) {
+            const nextRes = getH3ResolutionForAltitude(alt);
+            if (!wasClusters || currentClusterRes !== nextRes) {
+              refreshMarkersForCurrentMode(alt);
+            }
+          }
+        });
+      });
+
+      // Decide initial mode immediately
+      updateClusterModeForAltitude(globeInstance.pointOfView().altitude);
+
+      // Render markers for initial mode
+      refreshMarkersForCurrentMode(globeInstance.pointOfView().altitude);
     });
 
 }
@@ -548,8 +745,9 @@ function applyFilters() {
     return true;
   });
 
-  updateGlobePoints(filteredAirports);
   renderAirportList(filteredAirports);
+
+  refreshMarkersForCurrentMode(globeInstance?.pointOfView()?.altitude ?? 2.5);
 
   if (selectedAirportIcao) {
     const stillVisible = filteredAirports.some(
@@ -603,6 +801,7 @@ async function init() {
   if (searchInput) searchInput.addEventListener("input", applyFilters);
 
   applyFilters();
+  refreshMarkersForCurrentMode(globeInstance?.pointOfView()?.altitude ?? 2.5);
 
   let attempts = 0;
   const widgetTimer = setInterval(() => {
