@@ -1,32 +1,42 @@
 // main.js
 
+/* =======================================================================
+   Constants / Global State
+   ======================================================================= */
+
 const STATUS_COLORS = {
   base: "#a0aec0",
   in_dev: "#f6ad55",
   released: "#48bb78"
 };
 
+const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
+
+const CLUSTER_ALTITUDE_ON = 1.55;  // start clustering above this
+const CLUSTER_ALTITUDE_OFF = 1.35; // stop clustering below this (hysteresis)
+
 let allAirports = [];
 let filteredAirports = [];
+
 let globeInstance = null;
 let globeResizeObserver = null;
+
 let selectedAirportIcao = null;
+
+// clustering state
 let showClusters = false;
 let currentClusterRes = null;
 let zoomRafPending = false;
 let lastZoomAltitude = null;
 
-const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
-
-
-const CLUSTER_ALTITUDE_ON = 1.55;  // start clustering above this
-const CLUSTER_ALTITUDE_OFF = 1.35; // stop clustering below this (hysteresis)
-
-// Auto-rotate / interaction pause state
+// auto-rotate / interaction pause state
 let orbitControls = null;
 let autoRotateTimeoutId = null;
 
-// ---------- Data loading ----------
+
+/* =======================================================================
+   Data Loading
+   ======================================================================= */
 
 async function loadAirports() {
   try {
@@ -64,11 +74,9 @@ async function loadAirports() {
       lastUpdated,
       airports
     };
-
   } catch (err) {
     console.error("Error fetching airports.json:", err);
 
-    // Same fallback but wrapped in the new structure
     return {
       schemaVersion: 1,
       lastUpdated: null,
@@ -86,12 +94,22 @@ async function loadAirports() {
   }
 }
 
+
+/* =======================================================================
+   Small Utilities
+   ======================================================================= */
+
 function statusLabel(status) {
   if (status === "base") return "Base";
   if (status === "in_dev") return "In development";
   if (status === "released") return "Released";
   return status || "Unknown";
 }
+
+
+/* =======================================================================
+   Date Formatting (database updated label)
+   ======================================================================= */
 
 function normalizeIsoTimestamp(value) {
   if (!value) return null;
@@ -107,41 +125,6 @@ function normalizeIsoTimestamp(value) {
   }
 
   return `${base}${fraction}${tz}`;
-}
-
-function formatDatabaseUpdated(value) {
-  if (!value) return "Unknown";
-  const normalized = normalizeIsoTimestamp(value);
-  const date = new Date(normalized);
-  if (Number.isNaN(date.getTime())) return String(value);
-  return formatWithDayPeriodUpper(date, undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-    timeZoneName: "short"
-  });
-}
-
-function formatDatabaseUpdatedLocal(value) {
-  if (!value) return "Unknown";
-  const normalized = normalizeIsoTimestamp(value);
-  const date = new Date(normalized);
-  if (Number.isNaN(date.getTime())) return "Unknown";
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const useEnAu = typeof timeZone === "string" && timeZone.startsWith("Australia/");
-  const locale = useEnAu ? "en-AU" : undefined;
-
-  return formatWithDayPeriodUpper(date, locale, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short"
-  });
 }
 
 function formatWithDayPeriodUpper(date, locale, options) {
@@ -178,6 +161,48 @@ function formatWithDayPeriodUpper(date, locale, options) {
   return dateWithYear || timeWithZone || "Unknown";
 }
 
+function formatDatabaseUpdated(value) {
+  if (!value) return "Unknown";
+  const normalized = normalizeIsoTimestamp(value);
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return String(value);
+
+  return formatWithDayPeriodUpper(date, undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short"
+  });
+}
+
+function formatDatabaseUpdatedLocal(value) {
+  if (!value) return "Unknown";
+  const normalized = normalizeIsoTimestamp(value);
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const useEnAu = typeof timeZone === "string" && timeZone.startsWith("Australia/");
+  const locale = useEnAu ? "en-AU" : undefined;
+
+  return formatWithDayPeriodUpper(date, locale, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short"
+  });
+}
+
+
+/* =======================================================================
+   External Widget Helpers
+   ======================================================================= */
+
 function relocateBmcWidget() {
   const container = document.getElementById("bmc-widget-container");
   if (!container) return false;
@@ -195,7 +220,10 @@ function relocateBmcWidget() {
   return true;
 }
 
-// ---------- Resize Globe Helper ----------
+
+/* =======================================================================
+   Globe Resize Helpers
+   ======================================================================= */
 
 function syncGlobeToContainerSize() {
   if (!globeInstance) return;
@@ -235,14 +263,16 @@ function setupGlobeResizeHandling() {
   window.addEventListener("resize", syncGlobeToContainerSize);
 }
 
-// ---------- Auto-rotate interaction helpers ----------
+
+/* =======================================================================
+   Auto-Rotate Interaction Helpers
+   ======================================================================= */
 
 function setupAutoRotateInteraction(controls) {
   orbitControls = controls;
   if (!controls || typeof controls.addEventListener !== "function") return;
 
   const handleUserInteraction = () => {
-    // Pause and schedule resume in 5s
     pauseAutoRotate();
   };
 
@@ -266,7 +296,10 @@ function pauseAutoRotate(delay = 5000) {
   }, delay);
 }
 
-// ---------- Marker Clusterin Helpers ----------
+
+/* =======================================================================
+   Marker Clustering (H3)
+   ======================================================================= */
 
 function getH3ResolutionForAltitude(altitude) {
   // You can tweak these cutoffs to taste.
@@ -309,12 +342,10 @@ function buildClusters(airports, h3Res) {
 
   for (const b of buckets.values()) {
     if (b.airports.length === 1) {
-      // Keep the real airport marker (no “fake cluster” objects)
       singles.push(b.airports[0]);
       continue;
     }
 
-    // True cluster (2+)
     let latSum = 0;
     let lngSum = 0;
     const counts = { base: 0, in_dev: 0, released: 0 };
@@ -406,7 +437,10 @@ function refreshMarkersForCurrentMode(
     .labelResolution(() => 2);
 }
 
-// ---------- Globe ----------
+
+/* =======================================================================
+   Globe (Creation + Updates)
+   ======================================================================= */
 
 function createGlobe(airports) {
   const container = document.getElementById("globe");
@@ -434,7 +468,6 @@ function createGlobe(airports) {
       const status = statusLabel(d.status);
       return `${icao} – ${name}<br/>Status: ${status}`;
     })
-    // Make markers behave like list clicks
     .onPointClick(point => {
       if (!point) return;
 
@@ -455,20 +488,17 @@ function createGlobe(airports) {
       // Normal airport click
       focusOnAirport(point);
     })
-     .onGlobeReady(() => {
+    .onGlobeReady(() => {
       const controls = globeInstance.controls();
       if (controls) {
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.5;
 
-        // Hook pause/resume on user interaction
         setupAutoRotateInteraction(controls);
       }
-      
-      // Sync size and keep globe centered within its section
+
       setupGlobeResizeHandling();
-      
-      // Initial cluster mode setup
+
       globeInstance.onZoom(pov => {
         lastZoomAltitude = pov?.altitude ?? globeInstance.pointOfView().altitude;
 
@@ -501,7 +531,6 @@ function createGlobe(airports) {
       // Render markers for initial mode
       refreshMarkersForCurrentMode(globeInstance.pointOfView().altitude);
     });
-
 }
 
 function updateGlobePoints(airports) {
@@ -513,6 +542,11 @@ function updateGlobePoints(airports) {
     .pointLng(d => d.lng)
     .pointColor(d => STATUS_COLORS[d.status] || "#e5e7eb");
 }
+
+
+/* =======================================================================
+   Selection + List UI
+   ======================================================================= */
 
 function setSelectedAirport(icao, { scroll = false } = {}) {
   selectedAirportIcao = (icao || "").toUpperCase() || null;
@@ -531,10 +565,12 @@ function updateSelectedAirportInList({ scroll = false } = {}) {
 
   if (scroll && selectedAirportIcao) {
     const active = listEl.querySelector(`.airport-item[data-icao="${selectedAirportIcao}"]`);
-    if (active) active.scrollIntoView({
-      block: "center",
-      behavior: "smooth"
-    });
+    if (active) {
+      active.scrollIntoView({
+        block: "center",
+        behavior: "smooth"
+      });
+    }
   }
 }
 
@@ -590,8 +626,14 @@ function renderAirportList(airports) {
 
       listEl.appendChild(li);
     });
-    updateSelectedAirportInList();
+
+  updateSelectedAirportInList();
 }
+
+
+/* =======================================================================
+   Airport Focus + Details Overlay
+   ======================================================================= */
 
 function focusOnAirport(airport) {
   if (!globeInstance || !airport) return;
@@ -607,7 +649,6 @@ function focusOnAirport(airport) {
     1250 // easing duration (ms)
   );
 
-  // Pause autorotate a bit longer after focus
   pauseAutoRotate(6000);
 
   showAirportDetails(airport);
@@ -642,9 +683,7 @@ function showAirportDetails(airport) {
 
   if (coordsEl) {
     if (typeof airport.lat === "number" && typeof airport.lng === "number") {
-      coordsEl.textContent = `${airport.lat.toFixed(2)}, ${airport.lng.toFixed(
-        2
-      )}`;
+      coordsEl.textContent = `${airport.lat.toFixed(2)}, ${airport.lng.toFixed(2)}`;
     } else {
       coordsEl.textContent = "";
     }
@@ -666,7 +705,10 @@ function showAirportDetails(airport) {
   details.classList.remove("d-none");
 }
 
-// ---------- LocalStorage helpers ----------
+
+/* =======================================================================
+   LocalStorage (Filter State)
+   ======================================================================= */
 
 function loadFilterState() {
   try {
@@ -717,7 +759,10 @@ function saveFilterState() {
   }
 }
 
-// ---------- Filtering ----------
+
+/* =======================================================================
+   Filtering
+   ======================================================================= */
 
 function applyFilters() {
   const filterBase = document.getElementById("filter-base");
@@ -753,14 +798,18 @@ function applyFilters() {
     const stillVisible = filteredAirports.some(
       a => (a.icao || "").toUpperCase() === selectedAirportIcao
     );
-  if (!stillVisible) selectedAirportIcao = null;
+    if (!stillVisible) selectedAirportIcao = null;
   }
+
   updateSelectedAirportInList();
 
   saveFilterState();
 }
 
-// ---------- Init ----------
+
+/* =======================================================================
+   Init
+   ======================================================================= */
 
 async function init() {
   // Load full data object
@@ -775,6 +824,7 @@ async function init() {
   createGlobe(filteredAirports);
   renderAirportList(filteredAirports);
 
+  // Database updated labels
   const dbUpdatedUtcEl = document.getElementById("database-updated-utc");
   const dbUpdatedLocalEl = document.getElementById("database-updated-local");
   const localLabel = formatDatabaseUpdatedLocal(data.lastUpdated);
@@ -803,6 +853,7 @@ async function init() {
   applyFilters();
   refreshMarkersForCurrentMode(globeInstance?.pointOfView()?.altitude ?? 2.5);
 
+  // relocate BuyMeACoffee widget (3rd-party inject timing)
   let attempts = 0;
   const widgetTimer = setInterval(() => {
     attempts += 1;
