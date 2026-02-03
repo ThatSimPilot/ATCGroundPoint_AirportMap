@@ -331,7 +331,11 @@ function renderAirportList(airports) {
 
       const left = document.createElement("div");
       const title = document.createElement("div");
-      title.textContent = `${a.icao || "N/A"} – ${a.name || "Unknown"}`;
+      title.className = "airport-title";
+      const name = document.createElement("div");
+      name.className = "airport-name";
+      title.textContent = a.icao || "N/A";
+      name.textContent = a.name || "Unknown";
 
       const meta = document.createElement("div");
       meta.className = "airport-meta";
@@ -342,14 +346,14 @@ function renderAirportList(airports) {
       }
 
       left.appendChild(title);
+      left.appendChild(name);
       left.appendChild(meta);
 
-      const pill = document.createElement("span");
-      pill.className = `status-pill status-${a.status}`;
-      pill.textContent = statusLabel(a.status);
+      const dot = document.createElement("span");
+      dot.className = `legend-dot legend-${a.status}`;
 
       li.appendChild(left);
-      li.appendChild(pill);
+      li.appendChild(dot);
 
       // List click behaves like marker click
       li.addEventListener("click", () => focusOnAirport(a));
