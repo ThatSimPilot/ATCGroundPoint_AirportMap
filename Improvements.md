@@ -10,7 +10,7 @@
 10. ~~Add~~ Improve Marker Clustering
 11. Skeleton Loaders
 12. Dynamic Subtitle (Currently Showing...)
-13. Add github to center of footer
+13. ~~Add github to center of footer~~
 14. Last update time relative, UTC on hover
 15. Lighter background on footer
 16. BuyMeACoffee Popup Fix
