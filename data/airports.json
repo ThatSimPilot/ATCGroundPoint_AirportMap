@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-02-06T01:12:35.448611+00:00",
+  "lastUpdated": "2026-02-06T07:00:19.977377+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -137,6 +137,14 @@
       "name": "Toronto Pearson Airport",
       "lat": 43.6772,
       "lng": -79.6306,
+      "country": {
+        "code": "CA",
+        "name": "Canada"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -144,13 +152,22 @@
       "discordThread": null,
       "lastUpdated": "2025-09-02T08:44:09+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 183
     },
     {
       "icao": "EBCI",
       "name": "Brussels South Charleroi Airport",
       "lat": 50.4592,
       "lng": 4.45382,
+      "country": {
+        "code": "BE",
+        "name": "Belgium"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199050393021",
@@ -158,13 +175,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-01T20:47:03+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 49
     },
     {
       "icao": "EDDB",
       "name": "Berlin Brandenburg Airport",
       "lat": 52.35139,
       "lng": 13.493889,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199343333745",
@@ -172,13 +198,22 @@
       "discordThread": null,
       "lastUpdated": "2025-12-10T13:14:22+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 536
     },
     {
       "icao": "EDDF",
       "name": "Frankfurt-am-Main Airport",
       "lat": 50.0264,
       "lng": 8.543129,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198166970291",
@@ -186,13 +221,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-01T23:29:19+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 436
     },
     {
       "icao": "EDDH",
       "name": "Hamburg Airport",
       "lat": 53.6304,
       "lng": 9.988229,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198024265999",
@@ -200,13 +244,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-16T18:08:35+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 150
     },
     {
       "icao": "EDDL",
       "name": "D\u00fcsseldorf Airport",
       "lat": 51.2895,
       "lng": 6.766779,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199050393021",
@@ -214,13 +267,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-01T20:45:11+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 187
     },
     {
       "icao": "EDDM",
       "name": "Munich Airport",
       "lat": 48.3538,
       "lng": 11.7861,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198140663842",
@@ -228,13 +290,22 @@
       "discordThread": null,
       "lastUpdated": "2025-12-10T19:31:02+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 183
     },
     {
       "icao": "EDDN",
       "name": "Nuremberg Airport",
       "lat": 49.4987,
       "lng": 11.0669,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198024265999",
@@ -242,13 +313,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-12T10:35:37+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 76
     },
     {
       "icao": "EDDP",
       "name": "Leipzig Halle Airport",
       "lat": 51.4324,
       "lng": 12.2416,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -256,13 +336,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-07T18:35:01+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 121
     },
     {
       "icao": "EETN",
       "name": "Tallinn Lennart Meri Airport",
       "lat": 59.4133,
       "lng": 24.8328,
+      "country": {
+        "code": "EE",
+        "name": "Estonia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -270,13 +359,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-17T14:59:02+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 51
     },
     {
       "icao": "EGGD",
       "name": "Bristol Airport",
       "lat": 51.3827,
       "lng": -2.719089,
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198996562490",
@@ -284,13 +382,22 @@
       "discordThread": null,
       "lastUpdated": "2026-01-25T21:53:31+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 43
     },
     {
       "icao": "EGKK",
       "name": "London Gatwick Airport",
       "lat": 51.1481,
       "lng": -0.190277,
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198166970291",
@@ -298,13 +405,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-27T20:47:41+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 219
     },
     {
       "icao": "EGLL",
       "name": "London Heathrow Airport",
       "lat": 51.4706,
       "lng": -0.461941,
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198166970291",
@@ -312,13 +428,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-24T17:16:53+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 454
     },
     {
       "icao": "EGPH",
       "name": "Edinburgh Airport",
       "lat": 55.95,
       "lng": -3.372499,
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198079584596",
@@ -326,13 +451,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-26T13:29:42+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 93
     },
     {
       "icao": "EGSS",
       "name": "London Stansted Airport",
       "lat": 51.885,
       "lng": 0.234999,
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198198588238",
@@ -340,13 +474,22 @@
       "discordThread": null,
       "lastUpdated": "2026-02-01T19:58:19+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 12
     },
     {
       "icao": "EHAM",
       "name": "Amsterdam Schiphol Airport",
       "lat": 52.3086,
       "lng": 4.763889,
+      "country": {
+        "code": "NL",
+        "name": "Netherlands"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199050393021",
@@ -354,13 +497,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-01T20:38:36+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 342
     },
     {
       "icao": "EHEH",
       "name": "Eindhoven Airport",
       "lat": 51.4501,
       "lng": 5.374529,
+      "country": {
+        "code": "NL",
+        "name": "Netherlands"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199050393021",
@@ -368,13 +520,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-01T20:42:34+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 64
     },
     {
       "icao": "EHGG",
       "name": "Groningen Eelde Airport",
       "lat": 53.1197,
       "lng": 6.57944,
+      "country": {
+        "code": "NL",
+        "name": "Netherlands"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -382,13 +543,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-10T14:14:14+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 55
     },
     {
       "icao": "EHRD",
       "name": "Rotterdam The Hague Airport",
       "lat": 51.9569,
       "lng": 4.43722,
+      "country": {
+        "code": "NL",
+        "name": "Netherlands"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -396,13 +566,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-10T14:10:56+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 107
     },
     {
       "icao": "ELLX",
       "name": "Luxembourg -Findel Airport",
       "lat": 49.6266,
       "lng": 6.21152,
+      "country": {
+        "code": "LU",
+        "name": "Luxembourg"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -410,27 +589,45 @@
       "discordThread": null,
       "lastUpdated": "2025-07-19T13:31:09+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 64
     },
     {
       "icao": "ENGM",
       "name": "Oslo Gardermoen Airport",
       "lat": 60.1939,
       "lng": 11.100399,
+      "country": {
+        "code": "NO",
+        "name": "Norway"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "azchk",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1442715244613861526",
-      "lastUpdated": "2026-01-26T10:28:08.825299+00:00",
+      "lastUpdated": "2026-02-06T06:59:34.671198+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "ENTC",
       "name": "Troms\u00f8 Airport",
       "lat": 69.6833,
       "lng": 18.9189,
+      "country": {
+        "code": "NO",
+        "name": "Norway"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -438,13 +635,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-10T15:41:25+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 72
     },
     {
       "icao": "EPGD",
       "name": "Gda\u0144sk Lech Wa\u0142\u0119sa Airport",
       "lat": 54.3776,
       "lng": 18.4662,
+      "country": {
+        "code": "PL",
+        "name": "Poland"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198166970291",
@@ -452,13 +658,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-11T21:15:21+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 39
     },
     {
       "icao": "EPKK",
       "name": "Krak\u00f3w John Paul II   -Balice Airport",
       "lat": 50.0777,
       "lng": 19.7848,
+      "country": {
+        "code": "PL",
+        "name": "Poland"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198996562490",
@@ -466,13 +681,22 @@
       "discordThread": null,
       "lastUpdated": "2026-01-25T21:40:42+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 17
     },
     {
       "icao": "EVRA",
       "name": "Riga Airport",
       "lat": 56.9236,
       "lng": 23.9711,
+      "country": {
+        "code": "LV",
+        "name": "Latvia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199203488304",
@@ -480,13 +704,22 @@
       "discordThread": null,
       "lastUpdated": "2025-10-09T18:42:06+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 44
     },
     {
       "icao": "KATL",
       "name": "Atlanta Hartsfield Jackson Airport",
       "lat": 33.6367,
       "lng": -84.4281,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199024580125",
@@ -494,55 +727,91 @@
       "discordThread": null,
       "lastUpdated": "2026-01-22T17:55:33+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 60
     },
     {
       "icao": "KBOS",
       "name": "Boston General Edward Lawrence Logan Airport",
       "lat": 42.3643,
       "lng": -71.0052,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "cessnaskyhawk",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1405001679060992111",
-      "lastUpdated": "2026-01-26T10:28:26.539255+00:00",
+      "lastUpdated": "2026-02-06T06:59:42.184938+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "KDFW",
       "name": "Dallas-Fort Worth Airport",
       "lat": 32.8968,
       "lng": -97.038,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199101729270",
-      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3641943824",
+      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3655830938",
       "discordThread": null,
-      "lastUpdated": "2026-01-12T03:12:39+00:00",
+      "lastUpdated": "2026-01-30T08:46:29+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 20
     },
     {
       "icao": "KEWR",
       "name": "Newark Liberty Airport",
       "lat": 40.6925,
       "lng": -74.1687,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198080015735",
       "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3543478331",
       "discordThread": null,
-      "lastUpdated": "2025-12-27T18:45:38+00:00",
+      "lastUpdated": "2026-02-04T07:48:51+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 204
     },
     {
       "icao": "KFLL",
       "name": "Fort Lauderdale Hollywood Airport",
       "lat": 26.0726,
       "lng": -80.1527,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -550,13 +819,22 @@
       "discordThread": null,
       "lastUpdated": "2026-01-16T21:29:32+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 58
     },
     {
       "icao": "KLAX",
       "name": "Los Angeles Airport",
       "lat": 33.9425,
       "lng": -118.408,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198996562490",
@@ -564,13 +842,22 @@
       "discordThread": null,
       "lastUpdated": "2026-01-25T21:33:03+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 53
     },
     {
       "icao": "KLGA",
       "name": "New York La Guardia Airport",
       "lat": 40.7772,
       "lng": -73.8726,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198080015735",
@@ -578,13 +865,22 @@
       "discordThread": null,
       "lastUpdated": "2025-12-05T06:17:32+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 249
     },
     {
       "icao": "KMSY",
       "name": "New Orleans Louis Armstrong Airport",
       "lat": 29.9934,
       "lng": -90.258,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -592,13 +888,22 @@
       "discordThread": null,
       "lastUpdated": "2025-11-24T22:36:28+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 119
     },
     {
       "icao": "KPHL",
       "name": "Philadelphia Airport",
       "lat": 39.8719,
       "lng": -75.2411,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -606,27 +911,45 @@
       "discordThread": null,
       "lastUpdated": "2025-08-28T18:00:34+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 149
     },
     {
       "icao": "KPHX",
       "name": "Phoenix Sky Harbor Airport",
       "lat": 33.4343,
       "lng": -112.012,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "schiznofriendia",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1411171958904848395",
-      "lastUpdated": "2026-01-26T10:28:46.832304+00:00",
+      "lastUpdated": "2026-02-06T06:59:46.195426+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "KSFO",
       "name": "San Francisco Airport",
       "lat": 37.619,
       "lng": -122.375,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198080015735",
@@ -634,13 +957,22 @@
       "discordThread": null,
       "lastUpdated": "2025-12-26T15:15:26+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 254
     },
     {
       "icao": "KSTL",
       "name": "Saint Louis Lambert St Louis Airport",
       "lat": 38.7487,
       "lng": -90.37,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198080015735",
@@ -648,13 +980,22 @@
       "discordThread": null,
       "lastUpdated": "2025-10-14T19:11:18+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 110
     },
     {
       "icao": "LBSF",
       "name": "Sofia Airport",
       "lat": 42.696693,
       "lng": 23.411436,
+      "country": {
+        "code": "BG",
+        "name": "Bulgaria"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -662,13 +1003,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-28T20:25:33+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 48
     },
     {
       "icao": "LIML",
       "name": "Milan Linate Airport",
       "lat": 45.4451,
       "lng": 9.27674,
+      "country": {
+        "code": "IT",
+        "name": "Italy"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199050393021",
@@ -676,13 +1026,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-01T20:50:19+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 104
     },
     {
       "icao": "LIPQ",
       "name": "Trieste \u2013Friuli Venezia Giulia Airport",
       "lat": 45.8275,
       "lng": 13.4722,
+      "country": {
+        "code": "IT",
+        "name": "Italy"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -690,13 +1049,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-21T12:38:30+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 43
     },
     {
       "icao": "LOWI",
       "name": "Innsbruck Airport",
       "lat": 47.2602,
       "lng": 11.343999,
+      "country": {
+        "code": "AT",
+        "name": "Austria"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561197985520037",
@@ -704,13 +1072,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-26T17:46:35+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 138
     },
     {
       "icao": "LOWW",
       "name": "Vienna Schwechat Airport",
       "lat": 48.1103,
       "lng": 16.5697,
+      "country": {
+        "code": "AT",
+        "name": "Austria"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198134161300",
@@ -718,13 +1095,22 @@
       "discordThread": null,
       "lastUpdated": "2025-09-03T15:04:25+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 147
     },
     {
       "icao": "LROP",
       "name": "Bucharest Henri Coand\u0103 Airport",
       "lat": 44.5722,
       "lng": 26.1022,
+      "country": {
+        "code": "RO",
+        "name": "Romania"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -732,13 +1118,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-28T20:30:41+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 54
     },
     {
       "icao": "LTAI",
       "name": "Antalya Airport",
       "lat": 36.8987,
       "lng": 30.8005,
+      "country": {
+        "code": "TR",
+        "name": "Turkey"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -746,13 +1141,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-29T05:27:18+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 53
     },
     {
       "icao": "LTBJ",
       "name": "\u0130zmir Adnan Menderes Airport",
       "lat": 38.2924,
       "lng": 27.157,
+      "country": {
+        "code": "TR",
+        "name": "Turkey"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -760,13 +1164,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-24T19:25:52+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 49
     },
     {
       "icao": "LTFJ",
       "name": "Istanbul Sabiha G\u00f6k\u00e7en Airport",
       "lat": 40.8986,
       "lng": 29.3092,
+      "country": {
+        "code": "TR",
+        "name": "Turkey"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199150329368",
@@ -774,13 +1187,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-11T18:54:18+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 60
     },
     {
       "icao": "LTFM",
       "name": "Istanbul Airport",
       "lat": 41.275276,
       "lng": 28.751944,
+      "country": {
+        "code": "TR",
+        "name": "Turkey"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198015603191",
@@ -788,13 +1210,22 @@
       "discordThread": null,
       "lastUpdated": "2025-09-01T07:51:57+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 99
     },
     {
       "icao": "OMDB",
       "name": "Dubai Airport",
       "lat": 25.252798,
       "lng": 55.3644,
+      "country": {
+        "code": "AE",
+        "name": "United Arab Emirates"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199050393021",
@@ -802,13 +1233,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-03T17:36:17+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 250
     },
     {
       "icao": "PAKT",
       "name": "Ketchikan Airport",
       "lat": 55.3556,
       "lng": -131.714,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199813741154",
@@ -816,13 +1256,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-27T06:24:13+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 36
     },
     {
       "icao": "RCTP",
       "name": "Taipei Taiwan Taoyuan Airport",
       "lat": 25.0777,
       "lng": 121.233,
+      "country": {
+        "code": "TW",
+        "name": "Taiwan"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -830,13 +1279,22 @@
       "discordThread": null,
       "lastUpdated": "2025-09-18T18:22:34+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 88
     },
     {
       "icao": "RJAA",
       "name": "Tokyo Narita Airport",
       "lat": 35.7647,
       "lng": 140.386,
+      "country": {
+        "code": "JP",
+        "name": "Japan"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199005616626",
@@ -844,13 +1302,22 @@
       "discordThread": null,
       "lastUpdated": "2026-01-22T08:42:06+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 200
     },
     {
       "icao": "RJOO",
       "name": "Osaka Airport",
       "lat": 34.7855,
       "lng": 135.438,
+      "country": {
+        "code": "JP",
+        "name": "Japan"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199005616626",
@@ -858,13 +1325,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-21T10:46:34+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 108
     },
     {
       "icao": "RJTT",
       "name": "Tokyo Airport",
       "lat": 35.5523,
       "lng": 139.78,
+      "country": {
+        "code": "JP",
+        "name": "Japan"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198015603191",
@@ -872,13 +1348,22 @@
       "discordThread": null,
       "lastUpdated": "2025-10-22T09:55:42+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 238
     },
     {
       "icao": "ROAH",
       "name": "Naha Airport",
       "lat": 26.1958,
       "lng": 127.646,
+      "country": {
+        "code": "JP",
+        "name": "Japan"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199005616626",
@@ -886,13 +1371,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-12T16:57:14+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 117
     },
     {
       "icao": "SAEZ",
       "name": "Buenos Aires Ministro Pistarini Airport",
       "lat": -34.8222,
       "lng": -58.5358,
+      "country": {
+        "code": "AR",
+        "name": "Argentina"
+      },
+      "continent": {
+        "code": "SA",
+        "name": "South America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -900,13 +1394,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-28T20:32:12+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 43
     },
     {
       "icao": "SBGR",
       "name": "S\u00e3o Paulo Guarulhos - Governador Andr\u00e9 Franco Montoro Airport",
       "lat": -23.435556,
       "lng": -46.473057,
+      "country": {
+        "code": "BR",
+        "name": "Brazil"
+      },
+      "continent": {
+        "code": "SA",
+        "name": "South America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -914,13 +1417,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-28T20:34:08+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 76
     },
     {
       "icao": "SCEL",
       "name": "Santiago Comodoro Arturo Merino Ben\u00edtez Airport",
       "lat": -33.393,
       "lng": -70.7858,
+      "country": {
+        "code": "CL",
+        "name": "Chile"
+      },
+      "continent": {
+        "code": "SA",
+        "name": "South America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198403637185",
@@ -928,13 +1440,22 @@
       "discordThread": null,
       "lastUpdated": "2025-07-26T03:29:36+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 74
     },
     {
       "icao": "SKSP",
       "name": "San Andr\u00e9s Gustavo Rojas Pinilla Airport",
       "lat": 12.5836,
       "lng": -81.7112,
+      "country": {
+        "code": "CO",
+        "name": "Colombia"
+      },
+      "continent": {
+        "code": "SA",
+        "name": "South America"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199813741154",
@@ -942,13 +1463,22 @@
       "discordThread": null,
       "lastUpdated": "2025-11-14T12:56:43+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 24
     },
     {
       "icao": "UHWW",
       "name": "Vladivostok Knevichi Airport",
       "lat": 43.399,
       "lng": 132.148,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -956,13 +1486,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-09T07:31:47+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 31
     },
     {
       "icao": "ULLI",
       "name": "Saint-Petersburg Pulkovo Airport",
       "lat": 59.8003,
       "lng": 30.2625,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -970,13 +1509,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-08T15:29:26+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 44
     },
     {
       "icao": "UMMS",
       "name": "Minsk National Airport",
       "lat": 53.8825,
       "lng": 28.0307,
+      "country": {
+        "code": "BY",
+        "name": "Belarus"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -984,13 +1532,22 @@
       "discordThread": null,
       "lastUpdated": "2025-09-03T07:07:32+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 45
     },
     {
       "icao": "UNNT",
       "name": "Novosibirsk Tolmachevo Airport",
       "lat": 55.0126,
       "lng": 82.6507,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -998,13 +1555,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-09T07:36:28+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 36
     },
     {
       "icao": "URSS",
       "name": "Sochi Airport",
       "lat": 43.4499,
       "lng": 39.9566,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1012,13 +1578,22 @@
       "discordThread": null,
       "lastUpdated": "2025-11-13T14:58:53+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 24
     },
     {
       "icao": "USSS",
       "name": "Ekaterinburg Koltsovo Airport",
       "lat": 56.7431,
       "lng": 60.8027,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1026,13 +1601,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-27T14:47:20+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 27
     },
     {
       "icao": "UUDD",
       "name": "Moscow Domodedovo Airport",
       "lat": 55.4088,
       "lng": 37.9063,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1040,13 +1624,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-08T19:02:03+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 51
     },
     {
       "icao": "UUEE",
       "name": "Moscow Sheremetyevo Airport",
       "lat": 55.9726,
       "lng": 37.4146,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1054,13 +1647,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-09T06:39:50+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 87
     },
     {
       "icao": "UUWW",
       "name": "Moscow Vnukovo Airport",
       "lat": 55.5915,
       "lng": 37.2615,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1068,13 +1670,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-20T07:20:40+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 52
     },
     {
       "icao": "UWGG",
       "name": "Nizhniy Novgorod Strigino Airport",
       "lat": 56.2301,
       "lng": 43.784,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1082,13 +1693,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-26T14:52:38+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 27
     },
     {
       "icao": "UWKD",
       "name": "Kazan Airport",
       "lat": 55.6062,
       "lng": 49.2787,
+      "country": {
+        "code": "RU",
+        "name": "Russia"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198334060828",
@@ -1096,13 +1716,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-08T14:13:36+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 27
     },
     {
       "icao": "VHHH",
       "name": "Hong Kong Chek Lap Kok Airport",
       "lat": 22.3089,
       "lng": 113.915,
+      "country": {
+        "code": "HK",
+        "name": "Hong Kong"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198389660763",
@@ -1110,27 +1739,45 @@
       "discordThread": null,
       "lastUpdated": "2025-10-27T01:42:51+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 148
     },
     {
       "icao": "VVNB",
       "name": "Hanoi Noi Bai Airport",
       "lat": 21.2212,
       "lng": 105.807,
+      "country": {
+        "code": "VN",
+        "name": "Vietnam"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "a6rst",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1466736226542420000",
-      "lastUpdated": "2026-01-31T01:09:29.656892+00:00",
+      "lastUpdated": "2026-02-06T07:00:11.750952+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "YBBN",
       "name": "Brisbane City Brisbane Airport",
       "lat": -27.3842,
       "lng": 153.117,
+      "country": {
+        "code": "AU",
+        "name": "Australia"
+      },
+      "continent": {
+        "code": "OC",
+        "name": "Australia & Oceania"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561199243656924",
@@ -1138,55 +1785,91 @@
       "discordThread": null,
       "lastUpdated": "2026-01-12T10:30:29+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 50
     },
     {
       "icao": "YPPH",
       "name": "Perth International Airport",
       "lat": -31.940277,
       "lng": 115.96694,
+      "country": {
+        "code": "AU",
+        "name": "Australia"
+      },
+      "continent": {
+        "code": "OC",
+        "name": "Australia & Oceania"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "airpain_",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1430616698200789002",
-      "lastUpdated": "2026-01-26T10:30:26.005498+00:00",
+      "lastUpdated": "2026-02-06T07:00:16.467890+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "ZBAD",
       "name": "Beijing Daxing Airport",
       "lat": 39.509167,
       "lng": 116.41055,
+      "country": {
+        "code": "CN",
+        "name": "China"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "kimvan3170",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1410962669682557008",
-      "lastUpdated": "2026-01-26T10:30:28.117798+00:00",
+      "lastUpdated": "2026-02-06T07:00:16.968862+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "ZHHH",
       "name": "Wuhan Tianhe Airport",
       "lat": 30.7838,
       "lng": 114.208,
+      "country": {
+        "code": "CN",
+        "name": "China"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "in_dev",
       "source": "discord",
       "author": "bleufox.",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1464721940252987473",
-      "lastUpdated": "2026-01-26T10:30:31.220144+00:00",
+      "lastUpdated": "2026-02-06T07:00:17.470478+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "ZKPY",
       "name": "Pyongyang-si Sunan Airport",
       "lat": 39.2241,
       "lng": 125.67,
+      "country": {
+        "code": "KP",
+        "name": "North Korea"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198134161300",
@@ -1194,13 +1877,22 @@
       "discordThread": null,
       "lastUpdated": "2025-08-29T18:54:02+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 40
     },
     {
       "icao": "ZSAM",
       "name": "Xiamen Gaoqi Airport",
       "lat": 24.544,
       "lng": 118.128,
+      "country": {
+        "code": "CN",
+        "name": "China"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198389660763",
@@ -1208,13 +1900,22 @@
       "discordThread": null,
       "lastUpdated": "2025-11-16T10:10:05+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 36
     },
     {
       "icao": "ZSCN",
       "name": "Nanchang Changbei Airport",
       "lat": 28.865,
       "lng": 115.9,
+      "country": {
+        "code": "CN",
+        "name": "China"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198993401238",
@@ -1222,13 +1923,22 @@
       "discordThread": null,
       "lastUpdated": "2026-01-11T22:37:06+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 21
     },
     {
       "icao": "ZUUU",
       "name": "Chengdu Shuangliu Airport",
       "lat": 30.5785,
       "lng": 103.947,
+      "country": {
+        "code": "CN",
+        "name": "China"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
       "status": "released",
       "source": "steam",
       "author": "76561198389660763",
@@ -1236,7 +1946,8 @@
       "discordThread": null,
       "lastUpdated": "2025-08-16T15:03:33+00:00",
       "defaultIncluded": false,
-      "featured": false
+      "featured": false,
+      "steamSubscriptions": 84
     }
   ]
 }

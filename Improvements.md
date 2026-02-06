@@ -5,7 +5,7 @@
 ~~5. Increase Search Contrast~~
 ~~6. Highlight Airport when Selected~~
 7. Collapsable Sidebar
-8. Improved Filter + Clickable Legend
+~~8. Improved Filter + Clickable Legend~~
 9. Improved Aiport Info on Click
 10. ~~Add~~ Improve Marker Clustering
 11. Skeleton Loaders
@@ -16,13 +16,13 @@
 16. BuyMeACoffee Popup Fix
 
 
-## Filters
-- Release status
-- Continent/Country
-- Available on Steam
-- In map view
+~~## Filters~~
+~~- Release status~~
+~~- Continent/Country~~
+~~- Available on Steam~~
+~~- In map view~~
 
 
-## List Sorting
-- Recently Updated
-- Most Downloaded
+~~## List Sorting~~
+~~- Recently Updated~~
+~~- Most Downloaded~~

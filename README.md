@@ -7,6 +7,8 @@ https://thatsimpilot.github.io/ATCGroundPoint_AirportMap/
 
 <a href="https://www.buymeacoffee.com/thatsimpilot" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
+Suggestions are welcomed and much appreciated via the [discord thread](https://discord.com/channels/1312377412251680858/1460246374149783594).
+
 ---
 
 ## ✈ Purpose
@@ -77,7 +79,7 @@ This project is served via GitHub Pages.
 ## 📦 Future Roadmap
 Planned enhancements:
 - Contributor/author attribution
-- Region/country filtering
+~~- Region/country filtering~~
 - Status evolution history
 - Global stats
 - Additional UI polish

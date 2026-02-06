@@ -16,9 +16,18 @@ const DEFAULT_FILTER_STATE = {
   statuses: { base: true, in_dev: true, released: true },
   steamOnly: false,
   inView: false,
-  continent: "", // store code or name; we’ll match flexibly
-  country: "",   // store code or name; we’ll match flexibly
-  search: ""
+  continent: "",
+  country: "",
+  search: "",
+  sortBy: "icao",
+  sortDir: "down"
+};
+
+const DOWN_MEANS = {
+  icao: "asc",     // A–Z
+  name: "asc",     // A–Z
+  subs: "desc",    // highest first
+  updated: "desc"  // newest first
 };
 
 const CLUSTER_ALTITUDE_ON = 1.55;  // start clustering above this
@@ -133,6 +142,31 @@ function statusLabel(status) {
   if (status === "in_dev") return "In development";
   if (status === "released") return "Released";
   return status || "Unknown";
+}
+
+function parseIsoToMs(iso) {
+  if (!iso) return 0;
+  const t = Date.parse(String(iso));
+  return Number.isFinite(t) ? t : 0;
+}
+
+function getSteamSubscriptions(a) {
+  const n = Number(a?.steamSubscriptions ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function effectiveDir(sortBy) {
+  const downMeaning = DOWN_MEANS[sortBy] || "asc"; // fallback
+  const isDown = (filterState.sortDir || "down") === "down";
+
+  // If arrow is down: use the field’s downMeaning.
+  // If arrow is up: invert it.
+  if (isDown) return downMeaning;
+  return downMeaning === "asc" ? "desc" : "asc";
+}
+
+function dirMultiplier(sortBy) {
+  return effectiveDir(sortBy) === "asc" ? 1 : -1;
 }
 
 
@@ -612,8 +646,6 @@ function renderAirportList(airports) {
   listEl.innerHTML = "";
 
   airports
-    .slice()
-    .sort((a, b) => (a.icao || "").localeCompare(b.icao || ""))
     .forEach(a => {
       const li = document.createElement("li");
       li.className = "airport-item";
@@ -629,11 +661,18 @@ function renderAirportList(airports) {
 
       const meta = document.createElement("div");
       meta.className = "airport-meta";
+
+      const parts = [];
+
       if (typeof a.lat === "number" && typeof a.lng === "number") {
-        meta.textContent = `${a.lat.toFixed(2)}, ${a.lng.toFixed(2)}`;
-      } else {
-        meta.textContent = "";
+        parts.push(`${a.lat.toFixed(2)}, ${a.lng.toFixed(2)}`);
       }
+
+      if (a.source === "steam" && Number.isFinite(Number(a.steamSubscriptions))) {
+        parts.push(`Subscriptions: ${Number(a.steamSubscriptions).toLocaleString()}`);
+      }
+
+      meta.textContent = parts.join(" • ");
 
       left.appendChild(title);
       left.appendChild(name);
@@ -819,6 +858,7 @@ function applyFilters() {
     return true;
   });
 
+  filteredAirports = sortAirports(filteredAirports);
   renderAirportList(filteredAirports);
   refreshMarkersForCurrentMode(globeInstance?.pointOfView()?.altitude ?? 2.5);
 
@@ -830,18 +870,60 @@ function applyFilters() {
   }
 
   updateSelectedAirportInList();
+  syncFilterUiFromState();
   saveFilterState();
 }
 
 
+function sortAirports(list) {
+  const sortBy = filterState.sortBy || "icao";
+  const dir = dirMultiplier(sortBy);
+
+  const byIcao = (a, b) =>
+    (a.icao || "").localeCompare(b.icao || "") * dir;
+
+  const byName = (a, b) =>
+    (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }) * dir;
+
+  const bySubs = (a, b) =>
+    (Number(a.steamSubscriptions || 0) - Number(b.steamSubscriptions || 0)) * dir;
+
+  const byUpdated = (a, b) =>
+    ((Date.parse(a.lastUpdated || 0) || 0) - (Date.parse(b.lastUpdated || 0) || 0)) * dir;
+
+  const sorted = list.slice();
+
+  switch (sortBy) {
+    case "name":
+      sorted.sort((a, b) => byName(a, b) || ((a.icao || "").localeCompare(b.icao || "")));
+      break;
+
+    case "subs":
+      sorted.sort((a, b) => bySubs(a, b) || ((a.icao || "").localeCompare(b.icao || "")));
+      break;
+
+    case "updated":
+      sorted.sort((a, b) => byUpdated(a, b) || ((a.icao || "").localeCompare(b.icao || "")));
+      break;
+
+    case "icao":
+    default:
+      sorted.sort((a, b) => (a.icao || "").localeCompare(b.icao || "") * dir);
+      break;
+  }
+
+  return sorted;
+}
+
 function syncFilterUiFromState() {
-  // Legend toggle buttons
-  document.querySelectorAll(".legend-toggle").forEach(btn => {
+  // Status legend toggles
+  document.querySelectorAll(".legend-toggle").forEach((btn) => {
     const status = btn.dataset.status;
     const active = !!filterState.statuses?.[status];
     btn.classList.toggle("is-active", active);
   });
 
+  // Core filter controls
   const steamOnly = document.getElementById("filter-steam-only");
   const inView = document.getElementById("filter-in-view");
   const continent = document.getElementById("filter-continent");
@@ -853,21 +935,42 @@ function syncFilterUiFromState() {
   if (continent) continent.value = filterState.continent || "";
   if (country) country.value = filterState.country || "";
   if (searchInput) searchInput.value = filterState.search || "";
+
+  // Sort controls (connected dropdown + arrow)
+  const sortByEl = document.getElementById("sort-by");
+  const sortDirBtn = document.getElementById("sort-dir");
+
+  if (sortByEl) sortByEl.value = filterState.sortBy || "icao";
+
+  if (sortDirBtn) {
+    const icon = sortDirBtn.querySelector("i");
+    const dir = filterState.sortDir || "down"; // "down" or "up"
+    if (icon) {
+      icon.className = dir === "down" ? "bi bi-arrow-down" : "bi bi-arrow-up";
+    }
+  }
+
+  // Filter chips: reflect checked state with .is-active on the chip
+  document.querySelectorAll(".filter-chip").forEach((chip) => {
+    const inputId = chip.getAttribute("data-filter-chip");
+    const input = inputId ? document.getElementById(inputId) : null;
+    if (!input) return;
+    chip.classList.toggle("is-active", !!input.checked);
+  });
 }
 
+
 function setupFilterUiHandlers() {
-  // Legend toggle buttons
+  // Legend toggles
   document.querySelectorAll(".legend-toggle").forEach(btn => {
     btn.addEventListener("click", () => {
       const status = btn.dataset.status;
       if (!status) return;
 
-      const current = !!filterState.statuses[status];
-      filterState.statuses[status] = !current;
+      filterState.statuses[status] = !filterState.statuses[status];
 
-      // optional safeguard: don’t allow turning ALL off
-      const anyOn = Object.values(filterState.statuses).some(Boolean);
-      if (!anyOn) {
+      // don’t allow turning all off
+      if (!Object.values(filterState.statuses).some(Boolean)) {
         filterState.statuses[status] = true;
         return;
       }
@@ -883,9 +986,13 @@ function setupFilterUiHandlers() {
   const country = document.getElementById("filter-country");
   const searchInput = document.getElementById("search");
 
+  const sortByEl = document.getElementById("sort-by");
+  const sortDirBtn = document.getElementById("sort-dir");
+
   if (steamOnly) {
     steamOnly.addEventListener("change", () => {
       filterState.steamOnly = steamOnly.checked;
+      syncFilterUiFromState();
       applyFilters();
     });
   }
@@ -893,14 +1000,46 @@ function setupFilterUiHandlers() {
   if (inView) {
     inView.addEventListener("change", () => {
       filterState.inView = inView.checked;
+      syncFilterUiFromState();
       applyFilters();
     });
   }
 
+  if (sortByEl) {
+    sortByEl.addEventListener("change", () => {
+      filterState.sortBy = sortByEl.value || "icao";
+      syncFilterUiFromState();
+      applyFilters();
+    });
+  }
+
+  if (sortDirBtn) {
+    sortDirBtn.addEventListener("click", () => {
+      filterState.sortDir = (filterState.sortDir === "down") ? "up" : "down";
+      syncFilterUiFromState();
+      applyFilters();
+    });
+  }
+
+  // Filter chips: clicking anywhere toggles the underlying checkbox
+  document.querySelectorAll(".filter-chip").forEach(btn => {
+    const inputId = btn.getAttribute("data-filter-chip");
+    const input = inputId ? document.getElementById(inputId) : null;
+    if (!input) return;
+
+    btn.addEventListener("click", (e) => {
+      // Don’t block other UI interactions globally
+      e.stopPropagation();
+
+      input.checked = !input.checked;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
+
+
   if (continent) {
     continent.addEventListener("change", () => {
       filterState.continent = continent.value || "";
-      // Optional: reset country when continent changes
       filterState.country = "";
       populateCountryOptions();
       syncFilterUiFromState();
@@ -911,6 +1050,7 @@ function setupFilterUiHandlers() {
   if (country) {
     country.addEventListener("change", () => {
       filterState.country = country.value || "";
+      syncFilterUiFromState();
       applyFilters();
     });
   }
@@ -918,10 +1058,12 @@ function setupFilterUiHandlers() {
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       filterState.search = searchInput.value || "";
+      // no need to sync on every keystroke unless you want chips updated
       applyFilters();
     });
   }
 }
+
 
 function populateContinentOptions() {
   const el = document.getElementById("filter-continent");

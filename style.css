@@ -212,6 +212,131 @@ main > .container-fluid {
   color: #64748b;
 }
 
+.sort-select {
+  width: 170px;
+}
+
+.airports-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+
+/* =======================================================================
+   Filters styling
+   ======================================================================= */
+
+.filter-panel {
+  padding: 0.6rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.35);
+}
+
+.filter-row {
+  margin-top: 0.55rem;
+}
+
+.filter-chip {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  padding: 0.42rem 0.55rem;
+  border-radius: 0.65rem;
+
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.25);
+  color: #e5e7eb;
+
+  cursor: pointer;
+  text-align: left;
+
+  transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.filter-chip + .filter-chip {
+  margin-top: 0.35rem;
+}
+
+.filter-chip:hover {
+  background: rgba(148, 163, 184, 0.10);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+/* Hide the checkbox but keep it accessible for screen readers */
+.filter-chip .form-check-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* “Active” state (set via JS by toggling a class) */
+.filter-chip.is-active {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+/* Make selects match your dark aesthetic */
+.filter-panel .form-select {
+  background-color: rgba(15, 23, 42, 0.85);
+  border-color: rgba(148, 163, 184, 0.55);
+  color: #f8fafc;
+}
+
+/* Ensure option list doesn't flash white */
+.filter-panel .form-select option {
+  background-color: #020617;
+  color: #f8fafc;
+}
+
+/* Remove default focus glow in some browsers */
+.filter-panel .form-select:focus {
+  background-color: rgba(15, 23, 42, 0.95);
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 0.15rem rgba(96, 165, 250, 0.25);
+}
+
+.filter-panel .filter-row:last-child {
+  opacity: 0.9;
+}
+
+/* Sort select should match dark filter selects */
+.sort-select {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(148, 163, 184, 0.55) !important;
+  color: #f8fafc !important;
+  height: 30px;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.sort-select option {
+  background-color: #020617;
+  color: #f8fafc;
+}
+
+.sort-select:focus {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 0.15rem rgba(96, 165, 250, 0.25) !important;
+}
+
+.sort-dir-btn {
+  width: 34px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort-group .sort-select {
+  border-right: 0;
+}
+
 
 /* =======================================================================
    Legend

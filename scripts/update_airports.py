@@ -257,6 +257,7 @@ def fetch_steam_airports(existing_icaos: set[str]) -> dict[str, dict]:
         title = details.get("title") or ""
         creator = details.get("creator") or "Unknown"
         time_updated = details.get("time_updated") or 0
+        subscriptions = int(details.get("subscriptions") or 0)
 
         icao = extract_icao_from_text(title)
         if not icao:
@@ -277,6 +278,7 @@ def fetch_steam_airports(existing_icaos: set[str]) -> dict[str, dict]:
                 "creator": creator,
                 "time_updated": time_updated,
                 "workshop_url": workshop_url,
+                "subscriptions": subscriptions
             }
             print(
                 f"[INFO] Steam candidate {icao} updated to workshop {wid} "
@@ -284,17 +286,20 @@ def fetch_steam_airports(existing_icaos: set[str]) -> dict[str, dict]:
             )
 
     # Filter out ICAOs already present in airports.json
-    new_steam = {
+    steam_all = steam_by_icao
+
+    steam_new = {
         icao: info
         for icao, info in steam_by_icao.items()
         if icao not in existing_icaos
     }
 
     print(
-        f"[INFO] Steam airports: {len(steam_by_icao)} ICAOs scraped, "
-        f"{len(new_steam)} are new (not in airports.json)."
+        f"[INFO] Steam airports: {len(steam_all)} ICAOs scraped, "
+        f"{len(steam_new)} are new (not in airports.json)."
     )
-    return new_steam
+    return steam_all, steam_new
+
 
 
 # --------------------------------------------------------------------
@@ -582,7 +587,7 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
 
     # Step 1 - Steam
     if run_steam == True:
-        steam_new = fetch_steam_airports(existing_icaos)
+        steam_all, steam_new = fetch_steam_airports(existing_icaos)
         steam_icaos = set(steam_new.keys())
         print(f"Steam Scraped. Found {len(steam_icaos)} new ICAOs.")
     else:
@@ -663,12 +668,14 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
             workshop_url = info.get("workshop_url")
             discord_thread = None
             last_updated = to_iso_timestamp(info.get("time_updated")) or now_iso
+            subscriptions = int(info.get("subscriptions") or 0)
         else:
             status = "in_dev"
             author = info.get("author", "Unknown")
             workshop_url = None
             discord_thread = info.get("discord_thread")
             last_updated = now_iso
+            subscriptions = 0
 
         airport_entry = {
             "icao": icao,
@@ -685,6 +692,7 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
             "lastUpdated": last_updated,
             "defaultIncluded": False,
             "featured": False,
+            "steamSubscriptions": subscriptions,
         }
 
         new_airports.append(airport_entry)
@@ -732,13 +740,17 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
 if "--dry-detect" in sys.argv:
     check_json_exists()
     schema_version, base_airports, non_base_airports, existing_icaos = load_airports_state()
-    steam_new = fetch_steam_airports(existing_icaos)
+
+    steam_all, steam_new = fetch_steam_airports(existing_icaos)
     discord_new = fetch_discord_airports(existing_icaos, set(steam_new.keys()))
+
     new_count = len(steam_new) + len(discord_new)
     print(f"Dry-detect new ICAOs: {new_count}")
+
     for source, icaos in (("STEAM", steam_new), ("DISCORD", discord_new)):
         for icao in sorted(icaos.keys()):
             print(f" - [{source}] {icao}")
+
     sys.exit(0)
 
 if __name__ == "__main__":

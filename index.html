@@ -86,54 +86,92 @@
             <section class="sidebar-block">
               <h2 class="h6 mb-2 filters">More filters</h2>
 
-              <div class="form-check small mb-2">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="filter-steam-only"
-                />
-                <label class="form-check-label" for="filter-steam-only">
-                  Available on Steam only
-                </label>
-              </div>
-
-              <div class="form-check small mb-2">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="filter-in-view"
-                />
-                <label class="form-check-label" for="filter-in-view">
-                  Only airports in current view
-                </label>
-              </div>
-
-              <div class="mb-2">
-                <label class="form-label small mb-1" for="filter-continent"
-                  >Continent</label
+              <div class="filter-panel">
+                <button
+                  type="button"
+                  class="filter-chip"
+                  data-filter-chip="filter-steam-only"
                 >
-                <select
-                  id="filter-continent"
-                  class="form-select form-select-sm"
-                >
-                  <option value="">All continents</option>
-                </select>
-              </div>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="filter-steam-only"
+                  />
+                  <i class="bi bi-steam"></i>
+                  <span>Steam only</span>
+                </button>
 
-              <div>
-                <label class="form-label small mb-1" for="filter-country"
-                  >Country</label
+                <button
+                  type="button"
+                  class="filter-chip"
+                  data-filter-chip="filter-in-view"
                 >
-                <select id="filter-country" class="form-select form-select-sm">
-                  <option value="">All countries</option>
-                </select>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="filter-in-view"
+                  />
+                  <i class="bi bi-bounding-box"></i>
+                  <span>In view</span>
+                </button>
+
+                <div class="filter-row">
+                  <label class="form-label small mb-1" for="filter-continent"
+                    >Continent</label
+                  >
+                  <select
+                    id="filter-continent"
+                    class="form-select form-select-sm"
+                  >
+                    <option value="">All continents</option>
+                  </select>
+                </div>
+
+                <div class="filter-row">
+                  <label class="form-label small mb-1" for="filter-country"
+                    >Country</label
+                  >
+                  <select
+                    id="filter-country"
+                    class="form-select form-select-sm"
+                  >
+                    <option value="">All countries</option>
+                  </select>
+                </div>
               </div>
             </section>
 
             <section
               class="sidebar-block sidebar-block-last airport-list flex-grow-1 d-flex flex-column min-h-0"
             >
-              <h2 class="h6 mb-2 airports">Airports</h2>
+              <div
+                class="d-flex align-items-center justify-content-between mb-2 airports-header"
+              >
+                <h2 class="h6 mb-0 airports">Airports</h2>
+
+                <div class="input-group input-group-sm sort-group">
+                  <select
+                    id="sort-by"
+                    class="form-select sort-select"
+                    aria-label="Sort by"
+                  >
+                    <option value="icao">ICAO</option>
+                    <option value="name">Airport name</option>
+                    <option value="subs">Steam subscriptions</option>
+                    <option value="updated">Last updated</option>
+                  </select>
+
+                  <button
+                    id="sort-dir"
+                    class="btn btn-outline-secondary sort-dir-btn"
+                    type="button"
+                    aria-label="Toggle sort direction"
+                    title="Toggle sort direction"
+                  >
+                    <i class="bi bi-arrow-up"></i>
+                  </button>
+                </div>
+              </div>
               <div class="input-group input-group-sm mb-2 airport-search">
                 <span class="input-group-text">
                   <i class="bi bi-search"></i>
