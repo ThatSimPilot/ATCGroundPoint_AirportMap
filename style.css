@@ -248,6 +248,41 @@ main > .container-fluid {
   background: #48bb78;
 }
 
+/* Clickable legend toggles (status filter) */
+.legend-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  padding: 0.35rem 0.45rem;
+  margin-bottom: 0.25rem;
+
+  border-radius: 0.55rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.35);
+  color: #e5e7eb;
+
+  cursor: pointer;
+  text-align: left;
+
+  transition: background 120ms ease, border-color 120ms ease, opacity 120ms ease;
+}
+
+.legend-toggle:hover {
+  background: rgba(148, 163, 184, 0.10);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.legend-toggle.is-active {
+  opacity: 1;
+}
+
+.legend-toggle:not(.is-active) {
+  opacity: 0.45;
+  border-color: rgba(148, 163, 184, 0.08);
+}
+
 
 /* =======================================================================
    Airport Search + Airport List

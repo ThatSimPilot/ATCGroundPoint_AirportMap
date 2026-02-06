@@ -12,11 +12,22 @@ const STATUS_COLORS = {
 
 const FILTERS_STORAGE_KEY = "atcgp_filters_v1";
 
+const DEFAULT_FILTER_STATE = {
+  statuses: { base: true, in_dev: true, released: true },
+  steamOnly: false,
+  inView: false,
+  continent: "", // store code or name; we’ll match flexibly
+  country: "",   // store code or name; we’ll match flexibly
+  search: ""
+};
+
 const CLUSTER_ALTITUDE_ON = 1.55;  // start clustering above this
 const CLUSTER_ALTITUDE_OFF = 1.35; // stop clustering below this (hysteresis)
 
 let allAirports = [];
 let filteredAirports = [];
+
+let filterState = structuredClone(DEFAULT_FILTER_STATE)
 
 let globeInstance = null;
 let globeResizeObserver = null;
@@ -33,6 +44,24 @@ let lastZoomAltitude = null;
 let orbitControls = null;
 let autoRotateTimeoutId = null;
 
+function getAirportCountry(a) {
+  // supports either nested API-shaped objects or flat fields
+  const code = a?.country?.code || a?.countryCode || "";
+  const name = a?.country?.name || a?.countryName || "";
+  return { code, name };
+}
+
+function getAirportContinent(a) {
+  const code = a?.continent?.code || a?.continentCode || "";
+  const name = a?.continent?.name || a?.continentName || "";
+  return { code, name };
+}
+
+function isSteamAvailable(a) {
+  // Your dataset currently uses source + workshopUrl
+  // Steam airports are source === "steam" and generally have workshopUrl
+  return a?.source === "steam" || !!a?.workshopUrl;
+}
 
 /* =======================================================================
    Data Loading
@@ -522,6 +551,8 @@ function createGlobe(airports) {
               refreshMarkersForCurrentMode(alt);
             }
           }
+
+          if (filterState.inView) {applyFilters();}
         });
       });
 
@@ -652,6 +683,8 @@ function focusOnAirport(airport) {
   pauseAutoRotate(6000);
 
   showAirportDetails(airport);
+
+  if (filterState.inView) applyFilters();
 }
 
 function showAirportDetails(airport) {
@@ -716,44 +749,26 @@ function loadFilterState() {
     if (!raw) return;
 
     const data = JSON.parse(raw);
+    if (!data || typeof data !== "object") return;
 
-    const filterBase = document.getElementById("filter-base");
-    const filterInDev = document.getElementById("filter-in-dev");
-    const filterReleased = document.getElementById("filter-released");
-    const searchInput = document.getElementById("search");
-
-    if (filterBase && typeof data.base === "boolean") {
-      filterBase.checked = data.base;
-    }
-    if (filterInDev && typeof data.inDev === "boolean") {
-      filterInDev.checked = data.inDev;
-    }
-    if (filterReleased && typeof data.released === "boolean") {
-      filterReleased.checked = data.released;
-    }
-    if (searchInput && typeof data.search === "string") {
-      searchInput.value = data.search;
-    }
+    // Merge safely
+    filterState = {
+      ...structuredClone(DEFAULT_FILTER_STATE),
+      ...data,
+      statuses: {
+        ...structuredClone(DEFAULT_FILTER_STATE.statuses),
+        ...(data.statuses || {})
+      }
+    };
   } catch (e) {
     console.warn("Could not load filter state from localStorage:", e);
   }
 }
 
+
 function saveFilterState() {
   try {
-    const filterBase = document.getElementById("filter-base");
-    const filterInDev = document.getElementById("filter-in-dev");
-    const filterReleased = document.getElementById("filter-released");
-    const searchInput = document.getElementById("search");
-
-    const data = {
-      base: filterBase ? filterBase.checked : true,
-      inDev: filterInDev ? filterInDev.checked : true,
-      released: filterReleased ? filterReleased.checked : true,
-      search: searchInput ? searchInput.value : ""
-    };
-
-    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(filterState));
   } catch (e) {
     console.warn("Could not save filter state to localStorage:", e);
   }
@@ -765,23 +780,37 @@ function saveFilterState() {
    ======================================================================= */
 
 function applyFilters() {
-  const filterBase = document.getElementById("filter-base");
-  const filterInDev = document.getElementById("filter-in-dev");
-  const filterReleased = document.getElementById("filter-released");
-  const searchInput = document.getElementById("search");
-
-  const showBase = filterBase ? filterBase.checked : true;
-  const showInDev = filterInDev ? filterInDev.checked : true;
-  const showReleased = filterReleased ? filterReleased.checked : true;
-  const searchValue = (searchInput ? searchInput.value : "")
-    .trim()
-    .toLowerCase();
+  const searchValue = (filterState.search || "").trim().toLowerCase();
 
   filteredAirports = allAirports.filter(a => {
-    if (a.status === "base" && !showBase) return false;
-    if (a.status === "in_dev" && !showInDev) return false;
-    if (a.status === "released" && !showReleased) return false;
+    const st = a.status || "base";
 
+    // Status (legend toggles)
+    if (!filterState.statuses?.[st]) return false;
+
+    // Steam-only hides discord dev airports (and anything without workshop availability)
+    if (filterState.steamOnly && !isSteamAvailable(a)) return false;
+
+    // Continent
+    if (filterState.continent) {
+      const cont = getAirportContinent(a);
+      const key = cont.code || cont.name;
+      if (!key) return false;
+      if (String(key) !== String(filterState.continent)) return false;
+    }
+
+    // Country
+    if (filterState.country) {
+      const c = getAirportCountry(a);
+      const key = c.code || c.name;
+      if (!key) return false;
+      if (String(key) !== String(filterState.country)) return false;
+    }
+
+    // In view only
+    if (filterState.inView && !isAirportInCurrentView(a)) return false;
+
+    // Search
     if (searchValue) {
       const text = `${a.icao || ""} ${a.name || ""}`.toLowerCase();
       if (!text.includes(searchValue)) return false;
@@ -791,7 +820,6 @@ function applyFilters() {
   });
 
   renderAirportList(filteredAirports);
-
   refreshMarkersForCurrentMode(globeInstance?.pointOfView()?.altitude ?? 2.5);
 
   if (selectedAirportIcao) {
@@ -802,9 +830,208 @@ function applyFilters() {
   }
 
   updateSelectedAirportInList();
-
   saveFilterState();
 }
+
+
+function syncFilterUiFromState() {
+  // Legend toggle buttons
+  document.querySelectorAll(".legend-toggle").forEach(btn => {
+    const status = btn.dataset.status;
+    const active = !!filterState.statuses?.[status];
+    btn.classList.toggle("is-active", active);
+  });
+
+  const steamOnly = document.getElementById("filter-steam-only");
+  const inView = document.getElementById("filter-in-view");
+  const continent = document.getElementById("filter-continent");
+  const country = document.getElementById("filter-country");
+  const searchInput = document.getElementById("search");
+
+  if (steamOnly) steamOnly.checked = !!filterState.steamOnly;
+  if (inView) inView.checked = !!filterState.inView;
+  if (continent) continent.value = filterState.continent || "";
+  if (country) country.value = filterState.country || "";
+  if (searchInput) searchInput.value = filterState.search || "";
+}
+
+function setupFilterUiHandlers() {
+  // Legend toggle buttons
+  document.querySelectorAll(".legend-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const status = btn.dataset.status;
+      if (!status) return;
+
+      const current = !!filterState.statuses[status];
+      filterState.statuses[status] = !current;
+
+      // optional safeguard: don’t allow turning ALL off
+      const anyOn = Object.values(filterState.statuses).some(Boolean);
+      if (!anyOn) {
+        filterState.statuses[status] = true;
+        return;
+      }
+
+      syncFilterUiFromState();
+      applyFilters();
+    });
+  });
+
+  const steamOnly = document.getElementById("filter-steam-only");
+  const inView = document.getElementById("filter-in-view");
+  const continent = document.getElementById("filter-continent");
+  const country = document.getElementById("filter-country");
+  const searchInput = document.getElementById("search");
+
+  if (steamOnly) {
+    steamOnly.addEventListener("change", () => {
+      filterState.steamOnly = steamOnly.checked;
+      applyFilters();
+    });
+  }
+
+  if (inView) {
+    inView.addEventListener("change", () => {
+      filterState.inView = inView.checked;
+      applyFilters();
+    });
+  }
+
+  if (continent) {
+    continent.addEventListener("change", () => {
+      filterState.continent = continent.value || "";
+      // Optional: reset country when continent changes
+      filterState.country = "";
+      populateCountryOptions();
+      syncFilterUiFromState();
+      applyFilters();
+    });
+  }
+
+  if (country) {
+    country.addEventListener("change", () => {
+      filterState.country = country.value || "";
+      applyFilters();
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      filterState.search = searchInput.value || "";
+      applyFilters();
+    });
+  }
+}
+
+function populateContinentOptions() {
+  const el = document.getElementById("filter-continent");
+  if (!el) return;
+
+  const counts = new Map(); // key -> {label, n}
+  for (const a of allAirports) {
+    const c = getAirportContinent(a);
+    const key = c.code || c.name;
+    const label = c.name || c.code;
+    if (!key || !label) continue;
+
+    const cur = counts.get(key) || { label, n: 0 };
+    cur.n += 1;
+    counts.set(key, cur);
+  }
+
+  const items = Array.from(counts.entries())
+    .map(([value, obj]) => ({ value, label: obj.label, n: obj.n }))
+    .sort((x, y) => x.label.localeCompare(y.label));
+
+  el.innerHTML = `<option value="">All continents</option>` + items
+    .map(i => `<option value="${escapeHtml(i.value)}">${escapeHtml(i.label)} (${i.n})</option>`)
+    .join("");
+}
+
+function populateCountryOptions() {
+  const el = document.getElementById("filter-country");
+  if (!el) return;
+
+  const continentFilter = filterState.continent || "";
+
+  const counts = new Map();
+  for (const a of allAirports) {
+    // respect continent selection when building country list
+    if (continentFilter) {
+      const cont = getAirportContinent(a);
+      const contKey = cont.code || cont.name;
+      if (!contKey) continue;
+      if (String(contKey) !== String(continentFilter)) continue;
+    }
+
+    const c = getAirportCountry(a);
+    const key = c.code || c.name;
+    const label = c.name || c.code;
+    if (!key || !label) continue;
+
+    const cur = counts.get(key) || { label, n: 0 };
+    cur.n += 1;
+    counts.set(key, cur);
+  }
+
+  const items = Array.from(counts.entries())
+    .map(([value, obj]) => ({ value, label: obj.label, n: obj.n }))
+    .sort((x, y) => x.label.localeCompare(y.label));
+
+  el.innerHTML = `<option value="">All countries</option>` + items
+    .map(i => `<option value="${escapeHtml(i.value)}">${escapeHtml(i.label)} (${i.n})</option>`)
+    .join("");
+}
+
+// small utility to keep option building safe
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function angularDistanceRadians(lat1, lon1, lat2, lon2) {
+  const toRad = d => (d * Math.PI) / 180;
+  const φ1 = toRad(lat1);
+  const φ2 = toRad(lat2);
+  const Δφ = toRad(lat2 - lat1);
+  const Δλ = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function isAirportInCurrentView(a) {
+  if (!globeInstance) return true;
+  if (typeof a.lat !== "number" || typeof a.lng !== "number") return false;
+
+  const pov = globeInstance.pointOfView();
+  const centerLat = pov?.lat ?? 0;
+  const centerLng = pov?.lng ?? 0;
+
+  // Globe.gl altitude ~ camera distance FROM SURFACE in globe radii.
+  // Distance from globe center ≈ (1 + altitude).
+  const altitude = Math.max(0.01, pov?.altitude ?? 2.5);
+  const d = 1 + altitude;
+
+  // Horizon central angle for a camera at distance d*R:
+  // acos(R / (d*R)) = acos(1/d)
+  const horizon = Math.acos(1 / d);
+
+  // Pad slightly so it feels like "in view" instead of "barely in view"
+  const pad = 0.10; // radians (~5.7°). Tune 0.06–0.18
+  const maxAngle = Math.min(Math.PI / 2, horizon + pad);
+
+  const dist = angularDistanceRadians(centerLat, centerLng, a.lat, a.lng);
+  return dist <= maxAngle;
+}
+
+
 
 
 /* =======================================================================
@@ -840,16 +1067,15 @@ async function init() {
   // Restore filters from localStorage, then apply them
   loadFilterState();
 
-  const filterBase = document.getElementById("filter-base");
-  const filterInDev = document.getElementById("filter-in-dev");
-  const filterReleased = document.getElementById("filter-released");
-  const searchInput = document.getElementById("search");
+  // Build dropdown options from the data
+  populateContinentOptions();
+  populateCountryOptions();
 
-  if (filterBase) filterBase.addEventListener("change", applyFilters);
-  if (filterInDev) filterInDev.addEventListener("change", applyFilters);
-  if (filterReleased) filterReleased.addEventListener("change", applyFilters);
-  if (searchInput) searchInput.addEventListener("input", applyFilters);
+  // Sync UI controls + legend
+  syncFilterUiFromState();
+  setupFilterUiHandlers();
 
+  // Apply filters initially
   applyFilters();
   refreshMarkersForCurrentMode(globeInstance?.pointOfView()?.altitude ?? 2.5);
 

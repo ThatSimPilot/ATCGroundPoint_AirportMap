@@ -14,3 +14,15 @@
 14. Last update time relative, UTC on hover
 15. Lighter background on footer
 16. BuyMeACoffee Popup Fix
+
+
+## Filters
+- Release status
+- Continent/Country
+- Available on Steam
+- In map view
+
+
+## List Sorting
+- Recently Updated
+- Most Downloaded

@@ -49,56 +49,84 @@
           <!-- Sidebar -->
           <aside id="sidebar" class="sidebar d-flex flex-column rounded-3 p-3">
             <section class="sidebar-block">
-              <!-- Filters -->
-              <h2 class="h6 mb-2 filters">Filters</h2>
-              <div class="form-check small mb-1">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="filter-base"
-                  checked
-                />
-                <label class="form-check-label" for="filter-base"
-                  >Base airports</label
+              <div class="d-flex align-items-center justify-content-between">
+                <h2 class="h6 mb-2 legend">Legend</h2>
+                <span class="small text-secondary" style="opacity: 0.8"
+                  >Click to toggle</span
                 >
               </div>
-              <div class="form-check small mb-1">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="filter-in-dev"
-                  checked
-                />
-                <label class="form-check-label" for="filter-in-dev"
-                  >In development</label
-                >
-              </div>
-              <div class="form-check small mb-1">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  id="filter-released"
-                  checked
-                />
-                <label class="form-check-label" for="filter-released"
-                  >Released</label
-                >
-              </div>
-            </section>
 
-            <section class="sidebar-block">
-              <h2 class="h6 mb-2 legend">Legend</h2>
-              <div class="legend-item">
+              <button
+                type="button"
+                class="legend-toggle is-active"
+                data-status="base"
+              >
                 <span class="legend-dot legend-base"></span>
                 <span class="small">Base</span>
-              </div>
-              <div class="legend-item">
+              </button>
+
+              <button
+                type="button"
+                class="legend-toggle is-active"
+                data-status="in_dev"
+              >
                 <span class="legend-dot legend-in_dev"></span>
                 <span class="small">In development</span>
-              </div>
-              <div class="legend-item">
+              </button>
+
+              <button
+                type="button"
+                class="legend-toggle is-active"
+                data-status="released"
+              >
                 <span class="legend-dot legend-released"></span>
                 <span class="small">Released</span>
+              </button>
+            </section>
+            <section class="sidebar-block">
+              <h2 class="h6 mb-2 filters">More filters</h2>
+
+              <div class="form-check small mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="filter-steam-only"
+                />
+                <label class="form-check-label" for="filter-steam-only">
+                  Available on Steam only
+                </label>
+              </div>
+
+              <div class="form-check small mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="filter-in-view"
+                />
+                <label class="form-check-label" for="filter-in-view">
+                  Only airports in current view
+                </label>
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label small mb-1" for="filter-continent"
+                  >Continent</label
+                >
+                <select
+                  id="filter-continent"
+                  class="form-select form-select-sm"
+                >
+                  <option value="">All continents</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label small mb-1" for="filter-country"
+                  >Country</label
+                >
+                <select id="filter-country" class="form-select form-select-sm">
+                  <option value="">All countries</option>
+                </select>
               </div>
             </section>
 
@@ -194,7 +222,12 @@
               <i class="bi bi-github"></i>
             </a>
 
-            <a href="https://discord.com/channels/1312377412251680858/1401508715756126309" target="_blank" rel="noopener" aria-label="Discord">
+            <a
+              href="https://discord.com/channels/1312377412251680858/1401508715756126309"
+              target="_blank"
+              rel="noopener"
+              aria-label="Discord"
+            >
               <i class="bi bi-discord"></i>
             </a>
           </div>

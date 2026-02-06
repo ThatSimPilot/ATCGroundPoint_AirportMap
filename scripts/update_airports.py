@@ -647,6 +647,14 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
             print(f"[WARN] No lat/lng from AeroDataBox for {icao}, skipping.")
             continue
 
+        country = adb.get("country") or {}
+        continent = adb.get("continent") or {}
+
+        country_code = country.get("code")
+        country_name = country.get("name")
+        continent_code = continent.get("code")
+        continent_name = continent.get("name")
+
         now_iso = datetime.now(timezone.utc).isoformat()
 
         if info["source"] == "steam":
@@ -667,6 +675,8 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
             "name": name,
             "lat": float(lat),
             "lng": float(lng),
+            "country": {"code": country_code, "name": country_name},
+            "continent": {"code": continent_code, "name": continent_name},
             "status": status,
             "source": info["source"],
             "author": author,
