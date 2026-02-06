@@ -54,6 +54,10 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 # the channel id is 1401508715756126309
 DISCORD_CHANNEL_ID = os.environ.get("DISCORD_CHANNEL_ID")
 
+ICAO_EXLUSIONS = {
+    "WANT", "TEST", "DEMO", "SAMPLE", "EXAMPLE", "DUMMY", "FAKE", "WITH", "REAL"
+}
+
 
 # --------------------------------------------------------------------
 # Utility helpers
@@ -308,199 +312,233 @@ def fetch_steam_airports(existing_icaos: set[str]) -> dict[str, dict]:
 
 async def _fetch_discord_airports_async(channel_id: int) -> dict[str, dict]:
     """
-    Fetch ICAOs from a Discord forum or text channel.
-
-    For forum channels:
-      - each thread (active + archived) is treated as one airport
-      - ICAO is taken from thread name or starter message
-
-    For simple text channels:
-      - ICAO is taken from message content
+    Scrape ICAO codes from a Discord forum/text channel's threads.
 
     Returns:
-      dict[icao] -> dict with minimal metadata
+      { "KJFK": {"icao":"KJFK","source":"discord","discord_thread":url,"author":name,"updated_ts":int_ts}, ... }
+
+    Key robustness features:
+      - Uses thread.last_message_id first (fast) to get last activity timestamp
+      - Falls back to history(limit=1) with a hard timeout
+      - Starter message fetch is optional and timeout-protected
+      - Concurrency limited to avoid rate limit stalls
+      - Supports forum channels (active + archived threads)
     """
     if discord is None:
-        print("[INFO] discord.py is not installed, skipping Discord fetch.")
-        return {}
+        raise RuntimeError("discord.py is not available")
 
-    if not DISCORD_BOT_TOKEN:
-        print("[INFO] DISCORD_BOT_TOKEN not set, skipping Discord fetch.")
-        return {}
+    # Optional: define this at module level instead
+    DISCORD_ICAO_EXCLUDE = {
+        "WANT",
+    }
 
-    intents = discord.Intents.default()
-    # If you rely only on thread titles, this is not strictly required.
-    # Enable in dev portal if you want message content as well.
-    intents.message_content = True
-
-    client = discord.Client(intents=intents)
     result: dict[str, dict] = {}
 
-    async def handle_thread(thread: "discord.Thread") -> None:
-        """Extract ICAO from a single thread (title, then starter message)."""
-        starter_message = None
+    # Tune these if you have lots of threads
+    CONCURRENCY = 8
+    FETCH_TIMEOUT_S = 8
 
-        async def fetch_starter_message():
-            nonlocal starter_message
-            if starter_message is None:
-                try:
-                    starter_message = await thread.fetch_message(thread.id)
-                except Exception:
-                    starter_message = False
-            return starter_message if starter_message is not False else None
+    sem = asyncio.Semaphore(CONCURRENCY)
 
-        icao = extract_icao_from_text(thread.name or "")
+    intents = discord.Intents.default()
+    # Only enable if you actually need to parse starter message content
+    # (still works without it via thread titles)
+    intents.message_content = True
 
-        if icao is None and intents.message_content:
-            # fallback to starter message content if allowed
-            starter = await fetch_starter_message()
-            if starter is not None:
-                icao = extract_icao_from_text(starter.content or "")
+    done = asyncio.Event()
 
-        if not icao:
-            return
+    def _thread_url(thread: "discord.Thread") -> str:
+        g = thread.guild
+        if g is None:
+            return ""
+        return f"https://discord.com/channels/{g.id}/{thread.id}"
 
-        icao = icao.upper()
+    async def _safe_wait_for(coro, timeout_s: int = FETCH_TIMEOUT_S):
+        try:
+            return await asyncio.wait_for(coro, timeout=timeout_s)
+        except Exception:
+            return None
 
-        if thread.guild is None:
-            return
+    async def _fetch_starter_message(thread: "discord.Thread"):
+        # Starter message id for forum threads is the thread id
+        return await _safe_wait_for(thread.fetch_message(thread.id))
 
-        url = f"https://discord.com/channels/{thread.guild.id}/{thread.id}"
+    async def _fetch_last_message_ts(thread: "discord.Thread") -> int:
+        # 1) Fast path: last_message_id -> fetch that message
+        try:
+            if getattr(thread, "last_message_id", None):
+                msg = await _safe_wait_for(thread.fetch_message(thread.last_message_id))
+                if msg is not None and getattr(msg, "created_at", None):
+                    return int(msg.created_at.timestamp())
+        except Exception:
+            pass
 
-        author_name = "Unknown"
-        owner = getattr(thread, "owner", None)
-        if owner is not None and getattr(owner, "name", None):
-            author_name = owner.name
-        else:
-            starter = await fetch_starter_message()
-            if starter is not None and getattr(starter, "author", None):
-                author_name = getattr(starter.author, "name", None) or str(
-                    starter.author
-                )
+        # 2) Fallback: history(limit=1) with a hard timeout
+        async def _get_hist_ts():
+            async for msg in thread.history(limit=1, oldest_first=False):
+                if getattr(msg, "created_at", None):
+                    return int(msg.created_at.timestamp())
+            return None
 
-        existing = result.get(icao)
-        created_ts = int(thread.created_at.timestamp())
-        if existing is None or created_ts > existing["created_ts"]:
-            result[icao] = {
-                "icao": icao,
-                "source": "discord",
-                "discord_thread": url,
-                "author": author_name,
-                "created_ts": created_ts,
-            }
-            print(f"[INFO] Discord candidate {icao} from thread {thread.id}")
+        ts = await _safe_wait_for(_get_hist_ts())
+        if isinstance(ts, int):
+            return ts
 
-    @client.event
-    async def on_ready():
-        print(f"[INFO] Logged in as {client.user} (id={client.user.id})")
+        # 3) Last resort: thread.created_at
+        try:
+            if getattr(thread, "created_at", None):
+                return int(thread.created_at.timestamp())
+        except Exception:
+            pass
 
-        ch = client.get_channel(channel_id)
-        if ch is None:
-            print(f"[ERROR] Cannot find channel with id {channel_id}.")
-            await client.close()
-            return
+        return 0
 
-        print(f"[INFO] Discord channel: {ch} (type={type(ch)})")
-
-        # Forum channel: active + archived threads
-        if isinstance(ch, discord.ForumChannel):
-            # Active threads
-            threads = list(getattr(ch, "threads", []))
-            print(f"[INFO] Forum active threads: {len(threads)}")
-            for thread in threads:
-                await handle_thread(thread)
-
-            # Archived threads
+    async def _process_thread(thread: "discord.Thread") -> None:
+        async with sem:
             try:
-                archived_count = 0
-                async for thread in ch.archived_threads(limit=None):
-                    archived_count += 1
-                    await handle_thread(thread)
-                print(f"[INFO] Forum archived threads processed: {archived_count}")
-            except AttributeError:
-                print("[WARN] ForumChannel.archived_threads not available on this discord.py version.")
-        else:
-            # Plain text channel: scan message history
-            async for message in ch.history(limit=None, oldest_first=True):
-                if message.author.bot:
-                    continue
-                if message.guild is None:
-                    continue
+                # 1) Try title first
+                icao = extract_icao_from_text(thread.name or "")
+                starter = None
 
-                icao = extract_icao_from_text(message.content or "")
+                # 2) Fallback to starter message content
+                if not icao and intents.message_content:
+                    starter = await _fetch_starter_message(thread)
+                    if starter is not None:
+                        icao = extract_icao_from_text(getattr(starter, "content", "") or "")
+
                 if not icao:
-                    continue
+                    return
 
                 icao = icao.upper()
-                url = (
-                    f"https://discord.com/channels/"
-                    f"{message.guild.id}/{message.channel.id}/{message.id}"
-                )
-                created_ts = int(message.created_at.timestamp())
+                if icao in DISCORD_ICAO_EXCLUDE:
+                    return
+
+                if thread.guild is None:
+                    return
+
+                # Author name preference: thread.owner -> starter.author -> Unknown
+                author_name = "Unknown"
+                owner = getattr(thread, "owner", None)
+                if owner is not None and getattr(owner, "name", None):
+                    author_name = owner.name
+                else:
+                    if starter is None and intents.message_content:
+                        starter = await _fetch_starter_message(thread)
+                    if starter is not None and getattr(starter, "author", None) is not None:
+                        author_name = getattr(starter.author, "name", None) or str(starter.author)
+
+                updated_ts = await _fetch_last_message_ts(thread)
+
                 existing = result.get(icao)
-                if existing is None or created_ts > existing["created_ts"]:
+                if existing is None or updated_ts > existing.get("updated_ts", 0):
                     result[icao] = {
                         "icao": icao,
                         "source": "discord",
-                        "discord_thread": url,
-                        "author": str(message.author),
-                        "created_ts": created_ts,
+                        "discord_thread": _thread_url(thread),
+                        "author": author_name,
+                        "updated_ts": updated_ts,
                     }
-                    print(
-                        f"[INFO] Discord candidate {icao} from message {message.id}"
-                    )
 
-        print(f"[INFO] Discord airports scraped: {len(result)} ICAOs.")
-        await client.close()
+            except Exception:
+                # Swallow per-thread errors so one bad thread doesn't stall the whole scrape
+                return
 
+    async def _gather_threads(channel) -> list["discord.Thread"]:
+        threads: list["discord.Thread"] = []
+
+        # Forum channel: has active threads in .threads, archived via .archived_threads()
+        if hasattr(channel, "threads"):
+            try:
+                threads.extend(list(channel.threads))
+            except Exception:
+                pass
+
+            # Archived threads (public)
+            try:
+                archived_iter = channel.archived_threads(limit=None)
+                async for th in archived_iter:
+                    threads.append(th)
+            except Exception:
+                pass
+
+            return threads
+
+        # Text channel: try active threads if present
+        if hasattr(channel, "active_threads"):
+            try:
+                ths = await channel.active_threads()
+                if isinstance(ths, (list, tuple)):
+                    threads.extend(ths)
+            except Exception:
+                pass
+
+        return threads
+
+    class _Client(discord.Client):
+        async def on_ready(self):
+            try:
+                channel = self.get_channel(channel_id)
+                if channel is None:
+                    channel = await self.fetch_channel(channel_id)
+
+                threads = await _gather_threads(channel)
+
+                # Process threads with concurrency limit
+                tasks = [asyncio.create_task(_process_thread(th)) for th in threads]
+                if tasks:
+                    await asyncio.gather(*tasks, return_exceptions=True)
+
+            finally:
+                done.set()
+                await self.close()
+
+    client = _Client(intents=intents)
+
+    # Run client until scrape completes
     await client.start(DISCORD_BOT_TOKEN)
+    await done.wait()
+
     return result
 
 
 def fetch_discord_airports(existing_icaos: set[str],
-                           steam_icaos: set[str]) -> dict[str, dict]:
+                           steam_icaos: set[str]) -> tuple[dict[str, dict], dict[str, dict]]:
     """
-    Step 2 - Fetch airports from Discord.
+    Returns (discord_all, discord_new)
 
-    Only airports that are:
+    discord_new is filtered to:
       - not already in airports.json
       - not present in Steam results (Steam wins)
-    are returned.
-
-    Returns:
-      dict[icao] -> dict with minimal Discord metadata
     """
     if not DISCORD_CHANNEL_ID:
         print("[INFO] DISCORD_CHANNEL_ID not set, skipping Discord fetch.")
-        return {}
+        return {}, {}
 
     try:
         channel_id = int(DISCORD_CHANNEL_ID)
     except ValueError:
-        print(
-            f"[ERROR] DISCORD_CHANNEL_ID={DISCORD_CHANNEL_ID} is not a valid int."
-        )
-        return {}
+        print(f"[ERROR] DISCORD_CHANNEL_ID={DISCORD_CHANNEL_ID} is not a valid int.")
+        return {}, {}
 
     if discord is None or not DISCORD_BOT_TOKEN:
         print("[INFO] Discord library or token missing, skipping Discord fetch.")
-        return {}
+        return {}, {}
 
     print(f"[INFO] Fetching airports from Discord channel {channel_id}...")
-    discord_data = asyncio.run(_fetch_discord_airports_async(channel_id))
+    discord_all = asyncio.run(_fetch_discord_airports_async(channel_id))
 
-    # Filter out ICAOs that are already present in airports.json or in Steam
-    filtered = {
+    discord_new = {
         icao: info
-        for icao, info in discord_data.items()
+        for icao, info in discord_all.items()
         if icao not in existing_icaos and icao not in steam_icaos
     }
 
     print(
-        f"[INFO] Discord airports: {len(discord_data)} ICAOs scraped, "
-        f"{len(filtered)} are new (not in airports.json or Steam)."
+        f"[INFO] Discord airports: {len(discord_all)} ICAOs scraped, "
+        f"{len(discord_new)} are new (not in airports.json or Steam)."
     )
-    return filtered
+    return discord_all, discord_new
+
 
 
 def cache_path_for_icao(icao: str) -> Path:
@@ -597,11 +635,30 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
 
     # Step 2 - Discord (Steam wins on conflicts)
     if run_discord == True:
-        discord_new = fetch_discord_airports(existing_icaos, steam_icaos)
+        discord_all, discord_new = fetch_discord_airports(existing_icaos, steam_icaos)
         print(f"Discord Scraped. Found {len(discord_new)} new ICAOs.")
     else:
         print("Discord Skipped.")
         discord_new = {}
+        discord_all = {}
+
+    # Update existing Discord airports' lastUpdated based on latest thread activity
+    if run_discord:
+        updated_existing = 0
+
+        for a in non_base_airports:
+            if a.get("source") == "discord" and a.get("icao"):
+                icao = a["icao"].upper()
+                info = discord_all.get(icao)
+
+                if info and info.get("updated_ts"):
+                    new_iso = to_iso_timestamp(info["updated_ts"])
+                    if new_iso and new_iso != a.get("lastUpdated"):
+                        a["lastUpdated"] = new_iso
+                        updated_existing += 1
+
+        if updated_existing:
+            print(f"[INFO] Updated lastUpdated for {updated_existing} existing Discord airports.")
   
     # Step 3 - all new ICAOs that we need to call AeroDataBox for
     new_all: dict[str, dict] = {}
@@ -674,7 +731,7 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
             author = info.get("author", "Unknown")
             workshop_url = None
             discord_thread = info.get("discord_thread")
-            last_updated = now_iso
+            last_updated = to_iso_timestamp(info.get("updated_ts")) or now_iso
             subscriptions = 0
 
         airport_entry = {
@@ -742,7 +799,7 @@ if "--dry-detect" in sys.argv:
     schema_version, base_airports, non_base_airports, existing_icaos = load_airports_state()
 
     steam_all, steam_new = fetch_steam_airports(existing_icaos)
-    discord_new = fetch_discord_airports(existing_icaos, set(steam_new.keys()))
+    discord_all, discord_new = fetch_discord_airports(existing_icaos, set(steam_new.keys()))
 
     new_count = len(steam_new) + len(discord_new)
     print(f"Dry-detect new ICAOs: {new_count}")
