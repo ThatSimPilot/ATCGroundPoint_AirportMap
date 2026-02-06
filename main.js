@@ -664,12 +664,26 @@ function renderAirportList(airports) {
 
       const parts = [];
 
+      // Always keep coords if you want (optional)
       if (typeof a.lat === "number" && typeof a.lng === "number") {
         parts.push(`${a.lat.toFixed(2)}, ${a.lng.toFixed(2)}`);
       }
 
-      if (a.source === "steam" && Number.isFinite(Number(a.steamSubscriptions))) {
-        parts.push(`Subscriptions: ${Number(a.steamSubscriptions).toLocaleString()}`);
+      // Context-aware info
+      if (filterState.sortBy === "subs") {
+        const subs = Number(a.steamSubscriptions || 0);
+        if (subs > 0) {
+          parts.push(`Subs: ${subs.toLocaleString("en-AU")}`);
+        }
+      }
+
+      if (filterState.sortBy === "updated") {
+        if (a.lastUpdated) {
+          const d = new Date(a.lastUpdated);
+          if (!isNaN(d)) {
+            parts.push(`Updated: ${d.toLocaleDateString("en-AU")}`);
+          }
+        }
       }
 
       meta.textContent = parts.join(" • ");
