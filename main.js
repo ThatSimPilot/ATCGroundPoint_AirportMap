@@ -33,6 +33,8 @@ const DOWN_MEANS = {
 const CLUSTER_ALTITUDE_ON = 1.55;  // start clustering above this
 const CLUSTER_ALTITUDE_OFF = 1.35; // stop clustering below this (hysteresis)
 
+const HEADER_ROTATE_MS = 5000;
+
 let allAirports = [];
 let filteredAirports = [];
 
@@ -52,6 +54,13 @@ let lastZoomAltitude = null;
 // auto-rotate / interaction pause state
 let orbitControls = null;
 let autoRotateTimeoutId = null;
+
+let headerRotateTimer = null;
+let headerShowDefault = true;
+
+// value -> label maps so we can show "Asia" not "Continent filter"
+let continentLabelByValue = new Map();
+let countryLabelByValue = new Map();
 
 function getAirportCountry(a) {
   // supports either nested API-shaped objects or flat fields
@@ -169,6 +178,149 @@ function dirMultiplier(sortBy) {
   return effectiveDir(sortBy) === "asc" ? 1 : -1;
 }
 
+function updateHeaderSubheading() {
+  const el = document.getElementById("header-subheading");
+  if (!el) return;
+
+  const shown = filteredAirports.length;
+  const total = allAirports.length;
+
+  const parts = [];
+
+  // Core count text
+  if (shown === total) {
+    parts.push(`Showing all ${total} airports`);
+  } else {
+    parts.push(`Showing ${shown} of ${total} airports`);
+  }
+
+  // Status filter summary
+  const activeStatuses = Object.entries(filterState.statuses || {})
+    .filter(([, v]) => v)
+    .map(([k]) => k);
+
+  if (activeStatuses.length > 0 && activeStatuses.length < 3) {
+    const labelMap = { base: "Base", in_dev: "In development", released: "Released" };
+    parts.push(activeStatuses.map(s => labelMap[s] || s).join(", "));
+  }
+
+  // Other active filters
+  if (filterState.steamOnly) parts.push("Steam only");
+  if (filterState.inView) parts.push("In view");
+
+  if (filterState.country) {
+    parts.push("Country filter");
+  } else if (filterState.continent) {
+    parts.push("Continent filter");
+  }
+
+  if ((filterState.search || "").trim()) {
+    parts.push(`Search: "${filterState.search.trim()}"`);
+  }
+
+  el.textContent = parts.join(" • ");
+}
+
+/* =======================================================================
+   Rotating Header
+   ======================================================================= */
+
+function getHeaderDefaultText() {
+  const el = document.getElementById("header-subheading");
+  if (!el) return "";
+  return el.getAttribute("data-default-text") || "";
+}
+
+function getSelectedLabel(map, value) {
+  if (!value) return "";
+  return map.get(String(value)) || String(value);
+}
+
+function buildHeaderDynamicText() {
+  const shown = filteredAirports.length;
+  const total = allAirports.length;
+
+  const parts = [];
+
+  // Count
+  if (shown === total) {
+    parts.push(`Showing all ${total} airports`);
+  } else {
+    parts.push(`Showing ${shown} of ${total} airports`);
+  }
+
+  // Statuses (only mention if not all three)
+  const activeStatuses = Object.entries(filterState.statuses || {})
+    .filter(([, v]) => v)
+    .map(([k]) => k);
+
+  if (activeStatuses.length > 0 && activeStatuses.length < 3) {
+    const labelMap = { base: "Base", in_dev: "In development", released: "Released" };
+    parts.push(activeStatuses.map(s => labelMap[s] || s).join(", "));
+  }
+
+  // Specific geography names
+  if (filterState.continent) {
+    const contName = getSelectedLabel(continentLabelByValue, filterState.continent);
+    parts.push(contName);
+  }
+
+  if (filterState.country) {
+    const countryName = getSelectedLabel(countryLabelByValue, filterState.country);
+    parts.push(countryName);
+  }
+
+  // Other filters
+  if (filterState.steamOnly) parts.push("Steam only");
+  if (filterState.inView) parts.push("In view");
+
+  // Search
+  const q = (filterState.search || "").trim();
+  if (q) parts.push(`Search: "${q}"`);
+
+  return parts.join(" • ");
+}
+
+function renderHeaderSubheading({ animate = true } = {}) {
+  const el = document.getElementById("header-subheading");
+  if (!el) return;
+
+  const nextText = headerShowDefault
+    ? getHeaderDefaultText()
+    : buildHeaderDynamicText();
+
+  // No animation requested or first paint
+  if (!animate) {
+    el.textContent = nextText;
+    return;
+  }
+
+  // If text is already correct, do nothing
+  if (el.textContent === nextText) return;
+
+  // Fade out, swap, fade in
+  el.classList.add("is-fading");
+
+  window.setTimeout(() => {
+    el.textContent = nextText;
+    el.classList.remove("is-fading");
+  }, 220); // match CSS transition duration
+}
+
+
+function startHeaderSubheadingRotation() {
+  if (headerRotateTimer) clearInterval(headerRotateTimer);
+
+  // Ensure we show something immediately
+  headerShowDefault = true;
+  renderHeaderSubheading({ animate: false });
+
+  headerRotateTimer = setInterval(() => {
+    headerShowDefault = !headerShowDefault;
+    renderHeaderSubheading();
+  }, HEADER_ROTATE_MS);
+}
+  
 
 /* =======================================================================
    Date Formatting (database updated label)
@@ -886,6 +1038,10 @@ function applyFilters() {
   updateSelectedAirportInList();
   syncFilterUiFromState();
   saveFilterState();
+  updateHeaderSubheading();
+    if (!headerShowDefault) {
+    renderHeaderSubheading({ animate: true });
+  }
 }
 
 
@@ -1098,6 +1254,8 @@ function populateContinentOptions() {
   const items = Array.from(counts.entries())
     .map(([value, obj]) => ({ value, label: obj.label, n: obj.n }))
     .sort((x, y) => x.label.localeCompare(y.label));
+  
+  continentLabelByValue = new Map(items.map(i => [String(i.value), String(i.label)]));
 
   el.innerHTML = `<option value="">All continents</option>` + items
     .map(i => `<option value="${escapeHtml(i.value)}">${escapeHtml(i.label)} (${i.n})</option>`)
@@ -1133,6 +1291,8 @@ function populateCountryOptions() {
   const items = Array.from(counts.entries())
     .map(([value, obj]) => ({ value, label: obj.label, n: obj.n }))
     .sort((x, y) => x.label.localeCompare(y.label));
+
+  countryLabelByValue = new Map(items.map(i => [String(i.value), String(i.label)]));
 
   el.innerHTML = `<option value="">All countries</option>` + items
     .map(i => `<option value="${escapeHtml(i.value)}">${escapeHtml(i.label)} (${i.n})</option>`)
@@ -1226,6 +1386,8 @@ async function init() {
   // Build dropdown options from the data
   populateContinentOptions();
   populateCountryOptions();
+
+  startHeaderSubheadingRotation();
 
   // Sync UI controls + legend
   syncFilterUiFromState();
