@@ -662,6 +662,132 @@ main > .container-fluid {
   position: static !important;
 }
 
+/* Airport details header: keep status pill aligned with ICAO (top line) */
+.airport-details-card .airport-details-header{
+  align-items: flex-start !important; /* instead of centered */
+  gap: 0;
+}
+
+.airport-details-card .airport-details-header > div{
+  min-width: 0; /* allows name to wrap/clip without pushing the pill */
+}
+
+#airport-details-status{
+  flex: 0 0 auto;     /* don’t let the pill shrink */
+  margin-top: 0.05rem; /* tiny nudge to visually align with ICAO text */
+}
+
+#airport-details-icao{
+  line-height: 1.1;
+}
+
+/* Optional: keep long names tidy (2 lines then ellipsis) */
+#airport-details-name{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* Keep ICAO + status pill aligned, even when the name wraps */
+.airport-details-card .airport-details-top{
+  align-items: baseline; /* key: align text baselines */
+}
+
+#airport-details-icao{
+  line-height: 1.1;
+}
+
+#airport-details-status{
+  flex: 0 0 auto;
+  display: inline-flex;      /* makes vertical centering reliable */
+  align-items: center;
+  line-height: 1;
+  padding-top: 0.35em;       /* tune if needed */
+  padding-bottom: 0.35em;
+  transform: translateY(-1px); /* tiny baseline nudge */
+}
+
+/* Coords + link spacing */
+.airport-details-meta{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem; /* adjust to taste */
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+#airport-details-link{
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+#airport-details-link.disabled{
+  opacity: 0.6;
+  font-style: italic;
+}
+
+#airport-details-coords{
+  white-space: nowrap;
+}
+
+/* === Airport details vertical rhythm === */
+
+.airport-details-header{
+  margin-bottom: 0.35rem; /* space before coords row */
+}
+
+.airport-details-top{
+  margin-bottom: 0.2rem; /* ICAO → name spacing */
+}
+
+#airport-details-name{
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.25;
+}
+
+.airport-details-meta{
+  margin-top: 0.35rem; /* name → coords spacing */
+  line-height: 1.25;
+}
+
+/* --- Airport details: consistent vertical rhythm --- */
+.airport-details-card{
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem; /* tweak: 0.32 tighter, 0.45 airier */
+}
+
+/* Remove all stacked margins so gap is the only spacing */
+.airport-details-header,
+.airport-details-footer{
+  margin: 0 !important;
+}
+
+.airport-details-top{
+  margin: 0;
+}
+
+#airport-details-name{
+  margin: 0;
+  line-height: 1.25;
+}
+
+.airport-details-meta{
+  margin: 0;
+  line-height: 1.25;
+}
+
+/* Footer wrapper isn't doing anything useful */
+.airport-details-footer{
+  display: block;
+}
+
+
+
+
 
 /* =======================================================================
    Airport list scrollbar

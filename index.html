@@ -1,315 +1,205 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ATC Ground Point Airports</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/ico" sizes="64x64" href="assets/favicon.ico" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATC Ground Point Airports</title>
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
+  <!-- Favicon -->
+  <link rel="icon" type="image/ico" sizes="64x64" href="assets/favicon.ico" />
 
-    <!-- Bootstrap Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-    />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
 
-    <!-- Globe.gl -->
-    <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
-  </head>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
 
-  <body>
-    <!-- Header -->
-    <header class="py-3 bg-header text-light header-bar border-bottom">
-      <div class="container-fluid px-3">
-        <h1 class="h4 mb-1">ATC Ground Point Airports</h1>
-        <p
-          id="header-subheading"
-          class="mb-0 small text-light"
-          data-default-text="Browse base, in-development, and released airports on an interactive 3d globe."
-        ></p>
-      </div>
-    </header>
+  <!-- Globe.gl -->
+  <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
+</head>
 
-    <!-- Main content -->
-    <main class="d-flex flex-column flex-grow-1">
-      <div class="container-fluid flex-grow-1 overflow-hidden py-2 px-3">
-        <!-- Custom flex layout instead of Bootstrap row/cols -->
-        <div id="main-layout" class="main-layout">
-          <!-- Sidebar -->
-          <aside id="sidebar" class="sidebar d-flex flex-column rounded-3 p-3">
-            <section class="sidebar-block">
-              <div class="d-flex align-items-center justify-content-between">
-                <h2 class="h6 mb-2 legend">Legend</h2>
-                <span class="small text-secondary" style="opacity: 0.8"
-                  >Click to toggle</span
-                >
+<body>
+  <!-- Header -->
+  <header class="py-3 bg-header text-light header-bar border-bottom">
+    <div class="container-fluid px-3">
+      <h1 class="h4 mb-1">ATC Ground Point Airports</h1>
+      <p id="header-subheading" class="mb-0 small text-light"
+        data-default-text="Browse base, in-development, and released airports on an interactive 3d globe."></p>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="d-flex flex-column flex-grow-1">
+    <div class="container-fluid flex-grow-1 overflow-hidden py-2 px-3">
+      <!-- Custom flex layout instead of Bootstrap row/cols -->
+      <div id="main-layout" class="main-layout">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar d-flex flex-column rounded-3 p-3">
+          <section class="sidebar-block">
+            <div class="d-flex align-items-center justify-content-between">
+              <h2 class="h6 mb-2 legend">Legend</h2>
+              <span class="small text-secondary" style="opacity: 0.8">Click to toggle</span>
+            </div>
+
+            <button type="button" class="legend-toggle is-active" data-status="base">
+              <span class="legend-dot legend-base"></span>
+              <span class="small">Base</span>
+            </button>
+
+            <button type="button" class="legend-toggle is-active" data-status="in_dev">
+              <span class="legend-dot legend-in_dev"></span>
+              <span class="small">In development</span>
+            </button>
+
+            <button type="button" class="legend-toggle is-active" data-status="released">
+              <span class="legend-dot legend-released"></span>
+              <span class="small">Released</span>
+            </button>
+          </section>
+          <section class="sidebar-block">
+            <h2 class="h6 mb-2 filters">More filters</h2>
+
+            <div class="filter-panel">
+              <button type="button" class="filter-chip" data-filter-chip="filter-steam-only">
+                <input class="form-check-input" type="checkbox" id="filter-steam-only" />
+                <i class="bi bi-steam"></i>
+                <span>Steam only</span>
+              </button>
+
+              <button type="button" class="filter-chip" data-filter-chip="filter-in-view">
+                <input class="form-check-input" type="checkbox" id="filter-in-view" />
+                <i class="bi bi-bounding-box"></i>
+                <span>In view</span>
+              </button>
+
+              <div class="filter-row">
+                <label class="form-label small mb-1" for="filter-continent">Continent</label>
+                <select id="filter-continent" class="form-select form-select-sm">
+                  <option value="">All continents</option>
+                </select>
               </div>
 
-              <button
-                type="button"
-                class="legend-toggle is-active"
-                data-status="base"
-              >
-                <span class="legend-dot legend-base"></span>
-                <span class="small">Base</span>
-              </button>
+              <div class="filter-row">
+                <label class="form-label small mb-1" for="filter-country">Country</label>
+                <select id="filter-country" class="form-select form-select-sm">
+                  <option value="">All countries</option>
+                </select>
+              </div>
+            </div>
+          </section>
 
-              <button
-                type="button"
-                class="legend-toggle is-active"
-                data-status="in_dev"
-              >
-                <span class="legend-dot legend-in_dev"></span>
-                <span class="small">In development</span>
-              </button>
+          <section class="sidebar-block sidebar-block-last airport-list flex-grow-1 d-flex flex-column min-h-0">
+            <div class="d-flex align-items-center justify-content-between mb-2 airports-header">
+              <h2 class="h6 mb-0 airports">Airports</h2>
 
-              <button
-                type="button"
-                class="legend-toggle is-active"
-                data-status="released"
-              >
-                <span class="legend-dot legend-released"></span>
-                <span class="small">Released</span>
-              </button>
-            </section>
-            <section class="sidebar-block">
-              <h2 class="h6 mb-2 filters">More filters</h2>
+              <div class="input-group input-group-sm sort-group">
+                <select id="sort-by" class="form-select sort-select" aria-label="Sort by">
+                  <option value="icao">ICAO</option>
+                  <option value="name">Airport name</option>
+                  <option value="subs">Steam subscriptions</option>
+                  <option value="updated">Last updated</option>
+                </select>
 
-              <div class="filter-panel">
-                <button
-                  type="button"
-                  class="filter-chip"
-                  data-filter-chip="filter-steam-only"
-                >
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="filter-steam-only"
-                  />
-                  <i class="bi bi-steam"></i>
-                  <span>Steam only</span>
+                <button id="sort-dir" class="btn btn-outline-secondary sort-dir-btn" type="button"
+                  aria-label="Toggle sort direction" title="Toggle sort direction">
+                  <i class="bi bi-arrow-up"></i>
                 </button>
-
-                <button
-                  type="button"
-                  class="filter-chip"
-                  data-filter-chip="filter-in-view"
-                >
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="filter-in-view"
-                  />
-                  <i class="bi bi-bounding-box"></i>
-                  <span>In view</span>
-                </button>
-
-                <div class="filter-row">
-                  <label class="form-label small mb-1" for="filter-continent"
-                    >Continent</label
-                  >
-                  <select
-                    id="filter-continent"
-                    class="form-select form-select-sm"
-                  >
-                    <option value="">All continents</option>
-                  </select>
-                </div>
-
-                <div class="filter-row">
-                  <label class="form-label small mb-1" for="filter-country"
-                    >Country</label
-                  >
-                  <select
-                    id="filter-country"
-                    class="form-select form-select-sm"
-                  >
-                    <option value="">All countries</option>
-                  </select>
-                </div>
               </div>
-            </section>
+            </div>
+            <div class="input-group input-group-sm mb-2 airport-search">
+              <span class="input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="text" id="search" class="form-control" placeholder="Search by ICAO or name" />
+            </div>
+            <ul id="airport-list" class="list-unstyled flex-grow-1 overflow-auto mb-0"></ul>
+          </section>
+        </aside>
 
-            <section
-              class="sidebar-block sidebar-block-last airport-list flex-grow-1 d-flex flex-column min-h-0"
-            >
-              <div
-                class="d-flex align-items-center justify-content-between mb-2 airports-header"
-              >
-                <h2 class="h6 mb-0 airports">Airports</h2>
+        <!-- Globe Column -->
+        <section class="globe-column">
+          <div class="globe-inner">
+            <div class="globe-wrapper rounded-3">
+              <div id="globe" class="w-100 h-100"></div>
 
-                <div class="input-group input-group-sm sort-group">
-                  <select
-                    id="sort-by"
-                    class="form-select sort-select"
-                    aria-label="Sort by"
-                  >
-                    <option value="icao">ICAO</option>
-                    <option value="name">Airport name</option>
-                    <option value="subs">Steam subscriptions</option>
-                    <option value="updated">Last updated</option>
-                  </select>
-
-                  <button
-                    id="sort-dir"
-                    class="btn btn-outline-secondary sort-dir-btn"
-                    type="button"
-                    aria-label="Toggle sort direction"
-                    title="Toggle sort direction"
-                  >
-                    <i class="bi bi-arrow-up"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="input-group input-group-sm mb-2 airport-search">
-                <span class="input-group-text">
-                  <i class="bi bi-search"></i>
-                </span>
-                <input
-                  type="text"
-                  id="search"
-                  class="form-control"
-                  placeholder="Search by ICAO or name"
-                />
-              </div>
-              <ul
-                id="airport-list"
-                class="list-unstyled flex-grow-1 overflow-auto mb-0"
-              ></ul>
-            </section>
-          </aside>
-
-          <!-- Globe Column -->
-          <section class="globe-column">
-            <div class="globe-inner">
-              <div class="globe-wrapper rounded-3">
-                <div id="globe" class="w-100 h-100"></div>
-
-                <!-- Airport details overlay -->
-                <div id="airport-details" class="airport-details-card d-none">
-                  <div
-                    class="airport-details-header d-flex justify-content-between align-items-center mb-1"
-                  >
-                    <div>
-                      <div
-                        id="airport-details-icao"
-                        class="fw-semibold small"
-                      ></div>
-                      <div
-                        id="airport-details-name"
-                        class="small text-secondary"
-                      ></div>
-                    </div>
-                    <span
-                      id="airport-details-status"
-                      class="badge rounded-pill"
-                    ></span>
+              <!-- Airport details overlay -->
+              <div id="airport-details" class="airport-details-card d-none">
+                <div class="airport-details-header mb-1">
+                  <div class="airport-details-top d-flex justify-content-between gap-2">
+                    <div id="airport-details-icao" class="fw-semibold small"></div>
+                    <span id="airport-details-status" class="badge rounded-pill"></span>
                   </div>
-                  <div
-                    class="airport-details-footer d-flex justify-content-between align-items-center"
-                  >
-                    <div class="small text-secondary">
-                      <span id="airport-details-coords"></span>
-                    </div>
-                    <a
-                      id="airport-details-link"
-                      href="#"
-                      target="_blank"
-                      rel="noopener"
-                      class="small text-decoration-underline"
-                    >
+                  <div id="airport-details-name" class="small text-secondary"></div>
+                </div>
+
+                <div class="airport-details-footer d-flex justify-content-between align-items-center">
+                  <div class="airport-details-meta small text-secondary">
+                    <span id="airport-details-coords"></span>
+                    <a id="airport-details-link" href="#" target="_blank">
                       Open airport page
                     </a>
                   </div>
                 </div>
-
-                <div id="bmc-widget-container" aria-hidden="true"></div>
               </div>
+              <div id="bmc-widget-container" aria-hidden="true"></div>
             </div>
-          </section>
-        </div>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="py-2 bg-footer text-light small footer-bar border-top">
-      <div class="container-fluid px-3">
-        <div class="footer-content">
-          <!-- Left -->
-          <span>ATC Ground Point | Community airport overview</span>
-
-          <!-- Center -->
-          <div class="footer-links">
-            <a
-              href="https://github.com/ThatSimPilot/ATCGroundPoint_AirportMap"
-              target="_blank"
-              rel="noopener"
-              aria-label="GitHub repository"
-            >
-              <i class="bi bi-github"></i>
-            </a>
-
-            <a
-              href="https://discord.com/channels/1312377412251680858/1401508715756126309"
-              target="_blank"
-              rel="noopener"
-              aria-label="Discord"
-            >
-              <i class="bi bi-discord"></i>
-            </a>
           </div>
-
-          <!-- Right -->
-          <span class="footer-updated">
-            Database updated:
-            <span id="database-updated-utc" class="db-updated-text"
-              >Loading...</span
-            >
-            <span id="database-updated-local" class="db-updated-text"
-              >Loading...</span
-            >
-          </span>
-        </div>
+        </section>
       </div>
-    </footer>
+    </div>
+  </main>
 
-    <!-- Buy me a coffee -->
-    <script
-      data-name="BMC-Widget"
-      data-cfasync="false"
-      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-      data-id="thatsimpilot"
-      data-description="Support me on Buy me a coffee!"
-      data-message="Thank you for using the ATCGroundPoint Airport Map. If you'd like to see similar projects please consider supporting me."
-      data-color="#5F7FFF"
-      data-position="Right"
-      data-x_margin="18"
-      data-y_margin="18"
-    ></script>
+  <!-- Footer -->
+  <footer class="py-2 bg-footer text-light small footer-bar border-top">
+    <div class="container-fluid px-3">
+      <div class="footer-content">
+        <!-- Left -->
+        <span>ATC Ground Point | Community airport overview</span>
 
-    <!-- Bootstrap JS -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
+        <!-- Center -->
+        <div class="footer-links">
+          <a href="https://github.com/ThatSimPilot/ATCGroundPoint_AirportMap" target="_blank" rel="noopener"
+            aria-label="GitHub repository">
+            <i class="bi bi-github"></i>
+          </a>
 
-    <!-- H3 JS -->
-    <script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+          <a href="https://discord.com/channels/1312377412251680858/1401508715756126309" target="_blank" rel="noopener"
+            aria-label="Discord">
+            <i class="bi bi-discord"></i>
+          </a>
+        </div>
 
-    <!-- Custom JS -->
-    <script src="main.js"></script>
-  </body>
+        <!-- Right -->
+        <span class="footer-updated">
+          Database updated:
+          <span id="database-updated-utc" class="db-updated-text">Loading...</span>
+          <span id="database-updated-local" class="db-updated-text">Loading...</span>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Buy me a coffee -->
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+    data-id="thatsimpilot" data-description="Support me on Buy me a coffee!"
+    data-message="Thank you for using the ATCGroundPoint Airport Map. If you'd like to see similar projects please consider supporting me."
+    data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+
+  <!-- H3 JS -->
+  <script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+
+  <!-- Custom JS -->
+  <script src="main.js"></script>
+</body>
+
 </html>

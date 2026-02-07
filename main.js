@@ -413,6 +413,53 @@ function formatDatabaseUpdatedLocal(value) {
   });
 }
 
+function formatRelativeFromIso(value) {
+  if (!value) return "Unknown";
+
+  const normalized = normalizeIsoTimestamp(value);
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+
+  const diffMs = date.getTime() - Date.now(); // past = negative
+  const diffSec = Math.round(diffMs / 1000);
+
+  const rtf = new Intl.RelativeTimeFormat("en-AU", { numeric: "auto" });
+
+  const abs = Math.abs(diffSec);
+
+  // choose largest sensible unit
+  if (abs < 60) return rtf.format(diffSec, "second");
+  const diffMin = Math.round(diffSec / 60);
+  if (Math.abs(diffMin) < 60) return rtf.format(diffMin, "minute");
+  const diffHr = Math.round(diffSec / 3600);
+  if (Math.abs(diffHr) < 24) return rtf.format(diffHr, "hour");
+  const diffDay = Math.round(diffSec / 86400);
+  if (Math.abs(diffDay) < 7) return rtf.format(diffDay, "day");
+  const diffWeek = Math.round(diffSec / 604800);
+  if (Math.abs(diffWeek) < 5) return rtf.format(diffWeek, "week");
+  const diffMonth = Math.round(diffSec / 2629800); // avg month
+  if (Math.abs(diffMonth) < 12) return rtf.format(diffMonth, "month");
+  const diffYear = Math.round(diffSec / 31557600); // avg year
+  return rtf.format(diffYear, "year");
+}
+
+function startDatabaseUpdatedTicker(lastUpdatedIso) {
+  const relEl = document.getElementById("database-updated-utc");   // now: relative
+  const localEl = document.getElementById("database-updated-local"); // hover: local
+  if (!relEl || !localEl) return;
+
+  const setText = () => {
+    relEl.textContent = formatRelativeFromIso(lastUpdatedIso);
+    localEl.textContent = formatDatabaseUpdatedLocal(lastUpdatedIso);
+  };
+
+  setText();
+
+  // Keep relative time fresh
+  window.setInterval(setText, 60_000);
+}
+
+
 
 /* =======================================================================
    External Widget Helpers
@@ -1368,17 +1415,7 @@ async function init() {
   renderAirportList(filteredAirports);
 
   // Database updated labels
-  const dbUpdatedUtcEl = document.getElementById("database-updated-utc");
-  const dbUpdatedLocalEl = document.getElementById("database-updated-local");
-  const localLabel = formatDatabaseUpdatedLocal(data.lastUpdated);
-
-  if (dbUpdatedUtcEl) {
-    dbUpdatedUtcEl.textContent = formatDatabaseUpdated(data.lastUpdated);
-  }
-
-  if (dbUpdatedLocalEl) {
-    dbUpdatedLocalEl.textContent = localLabel;
-  }
+  startDatabaseUpdatedTicker(data.lastUpdated);
 
   // Restore filters from localStorage, then apply them
   loadFilterState();
