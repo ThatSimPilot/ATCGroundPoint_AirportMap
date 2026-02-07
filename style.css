@@ -2,31 +2,27 @@
    Base / Page
    ======================================================================= */
 
-/* General */
 html,
 body {
   height: 100%;
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #050816;
   color: #f7fafc;
 
-  /* key bits */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow: hidden; /* no page scroll - both axes */
+  overflow: hidden; /* lock page scroll */
 }
 
-/* make <main> the flexible center band between header and footer */
 main {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* allow it to shrink inside the viewport */
+  min-height: 0;
 }
 
 main > .container-fluid {
@@ -36,21 +32,15 @@ main > .container-fluid {
   flex-direction: column;
 }
 
-
 /* =======================================================================
    Header / Footer
    ======================================================================= */
 
-/* Header / footer borders – darker so they don't look like white gaps */
-.header-bar {
-  --bs-border-color: rgba(15, 23, 42, 0.9);
-}
-
+.header-bar,
 .footer-bar {
   --bs-border-color: rgba(15, 23, 42, 0.9);
 }
 
-/* Theme pieces */
 .bg-header {
   background: radial-gradient(circle at top left, #1a365d, #020617);
 }
@@ -59,7 +49,7 @@ main > .container-fluid {
   background: #020617;
 }
 
-/* Footer layout + updated text hover swap */
+/* Footer layout */
 .footer-content {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -72,28 +62,6 @@ main > .container-fluid {
 
 .footer-content > :last-child {
   justify-self: end;
-}
-
-.footer-updated {
-  margin-left: auto;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.db-updated-text {
-  display: none;
-}
-
-.footer-updated .db-updated-text:first-of-type {
-  display: inline;
-}
-
-.footer-updated:hover .db-updated-text:first-of-type {
-  display: none;
-}
-
-.footer-updated:hover .db-updated-text:last-of-type {
-  display: inline;
 }
 
 /* Footer center links */
@@ -117,7 +85,30 @@ main > .container-fluid {
   color: #f8fafc;
 }
 
-/* Header subheading fade */
+/* Footer updated text hover swap */
+.footer-updated {
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.db-updated-text {
+  display: none;
+}
+
+.footer-updated .db-updated-text:first-of-type {
+  display: inline;
+}
+
+.footer-updated:hover .db-updated-text:first-of-type {
+  display: none;
+}
+
+.footer-updated:hover .db-updated-text:last-of-type {
+  display: inline;
+}
+
+/* Header subheading fade (JS toggles .is-fading) */
 #header-subheading {
   opacity: 1;
   transition: opacity 220ms ease;
@@ -127,29 +118,27 @@ main > .container-fluid {
   opacity: 0;
 }
 
-
 /* =======================================================================
-   Main Layout (Sidebar + Globe)
+   Main Layout
    ======================================================================= */
 
 .main-layout {
   display: flex;
   flex-direction: row;
   flex: 1 1 auto;
-  min-height: 0; /* critical to avoid extra page height */
+  min-height: 0;
 }
-
 
 /* =======================================================================
    Sidebar
    ======================================================================= */
 
-/* Sidebar with fixed width */
 #sidebar {
-  flex: 0 0 280px; /* fixed width */
+  flex: 0 0 280px;
   max-width: 280px;
   min-width: 280px;
-  min-height: 0; /* critical to avoid extra page height */
+  min-height: 0;
+
   background: #020617;
   border: 1px solid rgba(148, 163, 184, 0.25);
   color: #e5e7eb;
@@ -159,13 +148,15 @@ main > .container-fluid {
 .sidebar-block {
   padding-bottom: 0.8rem;
   margin-bottom: 0.8rem;
+
   border-bottom: 1px solid transparent;
   border-image: linear-gradient(
       to right,
       transparent,
       rgba(148, 163, 184, 0.30),
       transparent
-    ) 1;
+    )
+    1;
 }
 
 .sidebar-block-last {
@@ -174,14 +165,13 @@ main > .container-fluid {
   border-bottom: 0;
 }
 
-/* Sidebar text + inputs on dark */
+/* Sidebar headings */
 .sidebar h2,
 .sidebar label,
 .sidebar .small {
   color: #e5e7eb;
 }
 
-/* Section heading accents */
 .sidebar h2 {
   position: relative;
   padding-left: 0.5rem;
@@ -198,20 +188,23 @@ main > .container-fluid {
   background: rgba(148, 163, 184, 0.6);
 }
 
-.sidebar h2.filters::before { background: #60a5fa; }
-.sidebar h2.legend::before { background: #f6ad55; }
-.sidebar h2.airports::before { background: #48bb78; }
+.sidebar h2.filters::before {
+  background: #60a5fa;
+}
 
-/* Make the checkboxes easier to see on dark */
+.sidebar h2.legend::before {
+  background: #f6ad55;
+}
+
+.sidebar h2.airports::before {
+  background: #48bb78;
+}
+
+/* Sidebar inputs */
 .sidebar .form-check-input {
   cursor: pointer;
 }
 
-.sidebar .form-check-label {
-  cursor: pointer;
-}
-
-/* Dark search box */
 .sidebar .form-control {
   background: #020617;
   border-color: rgba(148, 163, 184, 0.8);
@@ -222,9 +215,9 @@ main > .container-fluid {
   color: #64748b;
 }
 
-.sort-select {
-  width: 170px;
-}
+/* =======================================================================
+   Airports header row (title + sort controls)
+   ======================================================================= */
 
 .airports-header {
   display: flex;
@@ -233,9 +226,8 @@ main > .container-fluid {
   align-items: baseline;
 }
 
-
 /* =======================================================================
-   Filters styling
+   Filters (critical to keep Bootstrap from overriding)
    ======================================================================= */
 
 .filter-panel {
@@ -249,6 +241,7 @@ main > .container-fluid {
   margin-top: 0.55rem;
 }
 
+/* Filter chips are buttons; these styles define the look */
 .filter-chip {
   width: 100%;
   display: flex;
@@ -277,33 +270,31 @@ main > .container-fluid {
   border-color: rgba(148, 163, 184, 0.22);
 }
 
-/* Hide the checkbox but keep it accessible for screen readers */
+/* Hide the checkbox but keep it accessible */
 .filter-chip .form-check-input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-/* “Active” state (set via JS by toggling a class) */
+/* Active state (JS toggles .is-active) */
 .filter-chip.is-active {
   background: rgba(96, 165, 250, 0.12);
   border-color: rgba(96, 165, 250, 0.35);
 }
 
-/* Make selects match your dark aesthetic */
+/* Dark selects inside filter panel */
 .filter-panel .form-select {
   background-color: rgba(15, 23, 42, 0.85);
   border-color: rgba(148, 163, 184, 0.55);
   color: #f8fafc;
 }
 
-/* Ensure option list doesn't flash white */
 .filter-panel .form-select option {
   background-color: #020617;
   color: #f8fafc;
 }
 
-/* Remove default focus glow in some browsers */
 .filter-panel .form-select:focus {
   background-color: rgba(15, 23, 42, 0.95);
   border-color: #60a5fa;
@@ -314,11 +305,16 @@ main > .container-fluid {
   opacity: 0.9;
 }
 
-/* Sort select should match dark filter selects */
+/* =======================================================================
+   Sort controls
+   ======================================================================= */
+
 .sort-select {
+  width: 170px;
   background-color: rgba(15, 23, 42, 0.85) !important;
   border: 1px solid rgba(148, 163, 184, 0.55) !important;
   color: #f8fafc !important;
+
   height: 30px;
   padding-top: 0.2rem;
   padding-bottom: 0.2rem;
@@ -347,17 +343,9 @@ main > .container-fluid {
   border-right: 0;
 }
 
-
 /* =======================================================================
-   Legend
+   Legend (status toggles)
    ======================================================================= */
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.25rem;
-}
 
 .legend-dot {
   width: 10px;
@@ -383,7 +371,7 @@ main > .container-fluid {
   background: #48bb78;
 }
 
-/* Clickable legend toggles (status filter) */
+/* Clickable legend toggles (JS toggles .is-active) */
 .legend-toggle {
   width: 100%;
   display: flex;
@@ -415,17 +403,14 @@ main > .container-fluid {
 
 .legend-toggle:not(.is-active) {
   opacity: 0.45;
-  border-color: rgba(148, 163, 184, 0.08);
 }
 
-
 /* =======================================================================
-   Airport Search + Airport List
+   Airport Search + List
    ======================================================================= */
 
-/* Airport search bar */
 .airport-search .form-control {
-  background: rgba(15, 23, 42, 0.85); /* lighter than sidebar */
+  background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(148, 163, 184, 0.6);
   color: #f8fafc;
 }
@@ -434,14 +419,12 @@ main > .container-fluid {
   color: #cbd5f5;
 }
 
-/* Icon container */
 .airport-search .input-group-text {
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid rgba(148, 163, 184, 0.6);
   color: #e5e7eb;
 }
 
-/* Focus state */
 .airport-search .form-control:focus {
   background: rgba(15, 23, 42, 0.95);
   border-color: #60a5fa;
@@ -453,13 +436,17 @@ main > .container-fluid {
   transition: background 120ms ease, border-color 120ms ease;
 }
 
-/* Airport list container */
 .airport-list {
   min-height: 0;
 }
 
+/* List container + scrollbar */
 #airport-list {
   padding-right: 0.25rem;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(2, 6, 23, 0.35);
+  scrollbar-gutter: stable;
 }
 
 #airport-list .airport-item {
@@ -470,7 +457,32 @@ main > .container-fluid {
   margin-bottom: 0;
 }
 
-/* Airport item card */
+#airport-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+#airport-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin: 6px 0;
+}
+
+#airport-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  border: 2px solid rgba(2, 6, 23, 0.55);
+  background-clip: padding-box;
+}
+
+#airport-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+#airport-list::-webkit-scrollbar-thumb:active {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* Airport row card (JS creates airport-title/airport-name/airport-meta) */
 .airport-item {
   padding: 0.45rem 0.5rem;
   border-radius: 0.55rem;
@@ -486,31 +498,20 @@ main > .container-fluid {
   border: 1px solid rgba(148, 163, 184, 0.08);
   background: rgba(2, 6, 23, 0.4);
 
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.02),
-    0 4px 10px rgba(0, 0, 0, 0.25);
-
-  transition:
-    background 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02), 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
 .airport-item:hover {
   background: rgba(148, 163, 184, 0.12);
   border-color: rgba(148, 163, 184, 0.22);
-
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04),
-    0 6px 14px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 6px 14px rgba(0, 0, 0, 0.35);
 }
 
 .airport-item.is-selected {
   background: rgba(96, 165, 250, 0.14);
   border-color: rgba(96, 165, 250, 0.55);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04),
-    0 8px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
 .airport-item.is-selected .airport-title {
@@ -536,32 +537,10 @@ main > .container-fluid {
   color: #cbd5f5;
 }
 
-/* Status pills */
-.status-pill {
-  font-size: 0.7rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-.status-base {
-  background: rgba(160, 174, 192, 0.2);
-}
-
-.status-in-dev {
-  background: rgba(246, 173, 85, 0.18);
-}
-
-.status-released {
-  background: rgba(72, 187, 120, 0.18);
-}
-
-
 /* =======================================================================
    Globe Area
    ======================================================================= */
 
-/* Globe column takes remaining space */
 .globe-column {
   flex: 1 1 auto;
   display: flex;
@@ -569,7 +548,6 @@ main > .container-fluid {
   min-width: 0;
 }
 
-/* Globe fills remaining area */
 .globe-inner {
   flex: 1;
   display: flex;
@@ -584,19 +562,18 @@ main > .container-fluid {
   flex: 1 1 auto;
   width: 100%;
   height: 100%;
-  min-height: 0; /* or keep a small min-height if you like, see note below */
+  min-height: 0;
+
   background: #020617;
   border: 1px solid rgba(148, 163, 184, 0.25);
   overflow: hidden;
   position: relative;
 
-  /* Center the globe area inside this wrapper */
   display: flex;
-  align-items: center;      /* vertical center */
-  justify-content: center;  /* horizontal center */
+  align-items: center;
+  justify-content: center;
 }
 
-/* Make sure #globe itself can flex and shrink with the wrapper */
 #globe {
   width: 100%;
   height: 100%;
@@ -604,16 +581,27 @@ main > .container-fluid {
   min-height: 0;
 }
 
-/* And keep the canvas matching the container */
 #globe canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
 
+/* Buy Me a Coffee widget placement */
+#bmc-widget-container {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 6;
+}
+
+#bmc-widget-container #bmc-wbtn,
+#bmc-widget-container .bmc-btn-container {
+  position: static !important;
+}
 
 /* =======================================================================
-   Overlays / Widgets
+   Airport Details Overlay
    ======================================================================= */
 
 .airport-details-card {
@@ -622,6 +610,7 @@ main > .container-fluid {
   right: auto;
   bottom: 12px;
   max-width: 360px;
+
   padding: 0.75rem 0.9rem;
   border-radius: 0.75rem;
   background: rgba(15, 23, 42, 0.9);
@@ -642,202 +631,16 @@ main > .container-fluid {
   letter-spacing: 0.05em;
 }
 
-/* Optional: dim link if no external URL */
 .airport-details-card a.disabled {
   pointer-events: none;
   opacity: 0.5;
   text-decoration: none;
 }
 
-/* Buy Me a Coffee widget placement */
-#bmc-widget-container {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  z-index: 6;
-}
-
-#bmc-widget-container #bmc-wbtn,
-#bmc-widget-container .bmc-btn-container {
-  position: static !important;
-}
-
-/* Airport details header: keep status pill aligned with ICAO (top line) */
-.airport-details-card .airport-details-header{
-  align-items: flex-start !important; /* instead of centered */
-  gap: 0;
-}
-
-.airport-details-card .airport-details-header > div{
-  min-width: 0; /* allows name to wrap/clip without pushing the pill */
-}
-
-#airport-details-status{
-  flex: 0 0 auto;     /* don’t let the pill shrink */
-  margin-top: 0.05rem; /* tiny nudge to visually align with ICAO text */
-}
-
-#airport-details-icao{
-  line-height: 1.1;
-}
-
-/* Optional: keep long names tidy (2 lines then ellipsis) */
-#airport-details-name{
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
-/* Keep ICAO + status pill aligned, even when the name wraps */
-.airport-details-card .airport-details-top{
-  align-items: baseline; /* key: align text baselines */
-}
-
-#airport-details-icao{
-  line-height: 1.1;
-}
-
-#airport-details-status{
-  flex: 0 0 auto;
-  display: inline-flex;      /* makes vertical centering reliable */
-  align-items: center;
-  line-height: 1;
-  padding-top: 0.35em;       /* tune if needed */
-  padding-bottom: 0.35em;
-  transform: translateY(-1px); /* tiny baseline nudge */
-}
-
-/* Coords + link spacing */
-.airport-details-meta{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem; /* adjust to taste */
-  margin-top: 0.25rem;
-  width: 100%;
-}
-
-#airport-details-link{
-  white-space: nowrap;
-  margin-left: auto;
-}
-
-#airport-details-link.disabled{
-  opacity: 0.6;
-  font-style: italic;
-}
-
-#airport-details-coords{
-  white-space: nowrap;
-}
-
-/* === Airport details vertical rhythm === */
-
-.airport-details-header{
-  margin-bottom: 0.35rem; /* space before coords row */
-}
-
-.airport-details-top{
-  margin-bottom: 0.2rem; /* ICAO → name spacing */
-}
-
-#airport-details-name{
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 1.25;
-}
-
-.airport-details-meta{
-  margin-top: 0.35rem; /* name → coords spacing */
-  line-height: 1.25;
-}
-
-/* --- Airport details: consistent vertical rhythm --- */
-.airport-details-card{
-  display: flex;
-  flex-direction: column;
-  gap: 0.38rem; /* tweak: 0.32 tighter, 0.45 airier */
-}
-
-/* Remove all stacked margins so gap is the only spacing */
-.airport-details-header,
-.airport-details-footer{
-  margin: 0 !important;
-}
-
-.airport-details-top{
-  margin: 0;
-}
-
-#airport-details-name{
-  margin: 0;
-  line-height: 1.25;
-}
-
-.airport-details-meta{
-  margin: 0;
-  line-height: 1.25;
-}
-
-/* Footer wrapper isn't doing anything useful */
-.airport-details-footer{
-  display: block;
-}
-
-
-
-
-
-/* =======================================================================
-   Airport list scrollbar
-   ======================================================================= */
-
-/* Firefox */
-#airport-list {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(2, 6, 23, 0.35);
-}
-
-/* Chromium / Edge / Safari */
-#airport-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-#airport-list::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 999px;
-  margin: 6px 0; /* gives top/bottom breathing room */
-}
-
-#airport-list::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
-  border-radius: 999px;
-
-  /* makes thumb look slimmer and more “pill” */
-  border: 2px solid rgba(2, 6, 23, 0.55);
-  background-clip: padding-box;
-}
-
-#airport-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.55);
-}
-
-#airport-list::-webkit-scrollbar-thumb:active {
-  background: rgba(148, 163, 184, 0.7);
-}
-
-/* Optional: reduce harsh corner on Windows overlay scrollbars */
-#airport-list {
-  scrollbar-gutter: stable;
-}
-
-
 /* =======================================================================
    Responsive
    ======================================================================= */
 
-/* Responsive: stack vertically on small screens, no separator */
 @media (max-width: 767.98px) {
   .main-layout {
     flex-direction: column;
@@ -849,10 +652,6 @@ main > .container-fluid {
     max-width: 100%;
     min-width: 0;
     margin-bottom: 0.5rem;
-  }
-
-  .sidebar-resizer {
-    display: none;
   }
 
   .globe-wrapper {
