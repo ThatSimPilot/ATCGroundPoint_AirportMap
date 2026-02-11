@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-02-10T01:27:22.510732+00:00",
+  "lastUpdated": "2026-02-11T01:24:50.729708+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -173,7 +173,7 @@
       "author": "bleufox.",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1470178773726007329",
-      "lastUpdated": "2026-02-08T22:26:02+00:00",
+      "lastUpdated": "2026-02-10T21:39:57+00:00",
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 0
@@ -725,7 +725,7 @@
       "author": "void5977",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1470542737039429632",
-      "lastUpdated": "2026-02-09T22:17:54+00:00",
+      "lastUpdated": "2026-02-10T17:22:55+00:00",
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 0
@@ -1875,7 +1875,7 @@
       "author": "thatsimpilot_",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1470379975642320896",
-      "lastUpdated": "2026-02-10T01:19:25+00:00",
+      "lastUpdated": "2026-02-10T12:08:30+00:00",
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 0
