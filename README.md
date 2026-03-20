@@ -79,8 +79,8 @@ This project is served via GitHub Pages.
 ## 📦 Future Roadmap
 Planned enhancements:
 - Contributor/author attribution
-~~- Region/country filtering~~
 - Status evolution history
 - Global stats
 - Additional UI polish
+- ~~- Region/country filtering~~
 
