@@ -1904,6 +1904,29 @@
       "steamSubscriptions": 148
     },
     {
+      "icao": "VHHX",
+      "name": "Kai Tak International Airport",
+      "lat": 22.3286111,
+      "lng": 114.19416666666667,
+      "country": {
+        "code": "HK",
+        "name": "Hong Kong"
+      },
+      "continent": {
+        "code": "AS",
+        "name": "Asia"
+      },
+      "status": "released",
+      "source": "steam",
+      "author": "",
+      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3561274619",
+      "discordThread": null,
+      "lastUpdated": "2026-01-22T01:19:46+00:00",
+      "defaultIncluded": false,
+      "featured": false,
+      "steamSubscriptions": 133
+    },
+    {
       "icao": "VVNB",
       "name": "Hanoi Noi Bai Airport",
       "lat": 21.2212,
