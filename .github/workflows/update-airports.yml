@@ -31,7 +31,7 @@ jobs:
       - name: Detect new ICAOs (dry run, no APIMarket)
         id: detect
         env:
-          APIMARKET_API_KEY: ${{ secrets.APIMARKET_API_KEY }}
+          RAPIDAPI_API_KEY: ${{ secrets.RAPIDAPI_API_KEY }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         run: |
@@ -45,7 +45,7 @@ jobs:
       - name: Run full update (APIMarket enabled)
         if: steps.detect.outputs.new_count != '0'
         env:
-          APIMARKET_API_KEY: ${{ secrets.APIMARKET_API_KEY }}
+          RAPIDAPI_API_KEY: ${{ secrets.RAPIDAPI_API_KEY }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
         run: |
