@@ -42,9 +42,10 @@ STEAM_API_URL = (
     "GetPublishedFileDetails/v1/"
 )
 
-# AeroDataBox via APIMarket
-APIMARKET_BASE_URL = "https://prod.api.market/api/v1/aedbx/aerodatabox"
-APIMARKET_API_KEY = os.environ.get("APIMARKET_API_KEY")
+# AeroDataBox via RAPIDAPI
+RAPIDAPI_BASE_URL = "https://aerodatabox.p.rapidapi.com"
+RAPIDAPI_API_KEY = os.environ.get("RAPIDAPI_API_KEY")
+RAPIDAPI_HOST = "aerodatabox.p.rapidapi.com"
 
 
 # Discord
@@ -54,8 +55,8 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 # the channel id is 1401508715756126309
 DISCORD_CHANNEL_ID = os.environ.get("DISCORD_CHANNEL_ID")
 
-ICAO_EXLUSIONS = {
-    "WANT", "TEST", "DEMO", "SAMPLE", "EXAMPLE", "DUMMY", "FAKE", "WITH", "REAL"
+ICAO_EXCLUSIONS = {
+    "WANT", "TEST", "DEMO", "SAMPLE", "EXAMPLE", "DUMMY", "FAKE", "WITH", "REAL", "GAME", "REAL", "PTFS", "ATCG", "MSFS"
 }
 
 
@@ -112,10 +113,10 @@ def extract_icao_from_text(text: str) -> str | None:
     
     text = text.upper()
     matches = re.findall(r"\b([A-Z]{4})\b", text)
-    blacklist = {"ATCG", "MSFS"}  # add more if needed
+
 
     for code in matches:
-        if code not in blacklist:
+        if code not in ICAO_EXCLUSIONS:
             return code
     return None
 
@@ -572,31 +573,39 @@ def save_cached_airport(icao: str, data: dict) -> None:
 # --------------------------------------------------------------------
 
 def fetch_airport_from_aerodatabox(icao: str) -> dict:
-    if not APIMARKET_API_KEY:
-        raise RuntimeError(
-            "APIMARKET_API_KEY is not set. Cannot call AeroDataBox."
-        )
+    if not RAPIDAPI_API_KEY:
+        raise RuntimeError("RAPIDAPI_API_KEY is not set.")
 
-    # Try cache first
     cached = load_cached_airport(icao)
-    if cached is not None:
-        print(f"[INFO] Using cached AeroDataBox data for {icao}.")
+    if cached:
+        print(f"[INFO] Using cached data for {icao}")
         return cached
 
-    url = f"{APIMARKET_BASE_URL}/airports/icao/{icao}?withRunways=false&withTime=false"
+    url = f"{RAPIDAPI_BASE_URL}/airports/icao/{icao}"
+
     headers = {
-        "accept": "application/json",
-        "x-api-market-key": APIMARKET_API_KEY,
+        "x-rapidapi-key": RAPIDAPI_API_KEY,
+        "x-rapidapi-host": RAPIDAPI_HOST,
+        "Accept": "application/json"
     }
 
-    print(f"[INFO] Calling AeroDataBox for {icao}...")
-    resp = requests.get(url, headers=headers, timeout=20)
-    resp.raise_for_status()
-    data = resp.json()
+    params = {
+        "withRunways": "false",
+        "withTime": "false"
+    }
 
-    # Save to cache for future runs
+    print(f"[INFO] Fetching {icao} from RapidAPI...")
+
+    response = requests.get(url, headers=headers, params=params, timeout=20)
+
+    # Proper error handling (you didn’t have this before)
+    if response.status_code != 200:
+        print(f"[ERROR] Failed for {icao}: {response.status_code}")
+        print(response.text)
+        return None
+
+    data = response.json()
     save_cached_airport(icao, data)
-
     return data
 
 
@@ -688,6 +697,8 @@ def main(run_steam=True, run_discord=True, use_aerodatabox=True):
 
         try:
             adb = fetch_airport_from_aerodatabox(icao)
+            if not adb:
+                continue
         except Exception as e:
             print(f"[ERROR] AeroDataBox failed for {icao}: {e}")
             continue
