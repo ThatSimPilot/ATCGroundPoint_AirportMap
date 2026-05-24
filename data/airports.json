@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-05-23T02:07:03.699245+00:00",
+  "lastUpdated": "2026-05-24T02:15:29.702034+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -775,6 +775,29 @@
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 60
+    },
+    {
+      "icao": "KBNA",
+      "name": "Nashville Airport",
+      "lat": 36.1245,
+      "lng": -86.6782,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
+      "status": "released",
+      "source": "steam",
+      "author": "76561198188734606",
+      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3731075360",
+      "discordThread": null,
+      "lastUpdated": "2026-05-24T01:28:55+00:00",
+      "defaultIncluded": false,
+      "featured": false,
+      "steamSubscriptions": 2
     },
     {
       "icao": "KBOS",
