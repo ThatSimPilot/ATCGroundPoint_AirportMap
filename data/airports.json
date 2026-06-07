@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-06-06T02:11:32.677373+00:00",
+  "lastUpdated": "2026-06-07T02:38:15.100286+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -1511,6 +1511,29 @@
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 36
+    },
+    {
+      "icao": "PHNL",
+      "name": "Honolulu Airport",
+      "lat": 21.3187,
+      "lng": -157.922,
+      "country": {
+        "code": "US",
+        "name": "United States"
+      },
+      "continent": {
+        "code": "NA",
+        "name": "North America"
+      },
+      "status": "released",
+      "source": "steam",
+      "author": "76561199472739101",
+      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3739686307",
+      "discordThread": null,
+      "lastUpdated": "2026-06-06T15:01:32+00:00",
+      "defaultIncluded": false,
+      "featured": false,
+      "steamSubscriptions": 5
     },
     {
       "icao": "RCTP",
