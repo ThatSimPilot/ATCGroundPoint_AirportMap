@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-08-05T01:43:39.077419+00:00",
+  "lastUpdated": "2026-08-06T01:43:35.882555+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -361,6 +361,29 @@
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 121
+    },
+    {
+      "icao": "EDLP",
+      "name": "Paderborn Lippstadt Airport",
+      "lat": 51.6141,
+      "lng": 8.616319,
+      "country": {
+        "code": "DE",
+        "name": "Germany"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
+      "status": "in_dev",
+      "source": "discord",
+      "author": "lifemytouchnr2",
+      "workshopUrl": null,
+      "discordThread": "https://discord.com/channels/1312377412251680858/1534587765226864680",
+      "lastUpdated": "2026-08-05T19:13:27+00:00",
+      "defaultIncluded": false,
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "EETN",
@@ -1323,7 +1346,7 @@
       "author": "lifemytouchnr2",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1534330784532533408",
-      "lastUpdated": "2026-08-04T22:42:45+00:00",
+      "lastUpdated": "2026-08-05T12:17:34+00:00",
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 0
