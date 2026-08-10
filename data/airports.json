@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-08-09T00:58:32.336779+00:00",
+  "lastUpdated": "2026-08-10T01:00:20.821842+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -380,7 +380,7 @@
       "author": "lifemytouchnr2",
       "workshopUrl": null,
       "discordThread": "https://discord.com/channels/1312377412251680858/1534587765226864680",
-      "lastUpdated": "2026-08-07T19:56:56+00:00",
+      "lastUpdated": "2026-08-09T22:19:37+00:00",
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 0
@@ -430,6 +430,29 @@
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 1
+    },
+    {
+      "icao": "EGCC",
+      "name": "Manchester Airport",
+      "lat": 53.3537,
+      "lng": -2.27495,
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "continent": {
+        "code": "EU",
+        "name": "Europe"
+      },
+      "status": "in_dev",
+      "source": "discord",
+      "author": "lifemytouchnr2",
+      "workshopUrl": null,
+      "discordThread": "https://discord.com/channels/1312377412251680858/1536097494721634314",
+      "lastUpdated": "2026-08-09T20:52:37+00:00",
+      "defaultIncluded": false,
+      "featured": false,
+      "steamSubscriptions": 0
     },
     {
       "icao": "EGGD",
