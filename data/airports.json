@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastUpdated": "2026-08-19T00:41:00.164871+00:00",
+  "lastUpdated": "2026-08-20T00:40:42.352950+00:00",
   "airports": [
     {
       "icao": "CYVR",
@@ -1695,6 +1695,29 @@
       "defaultIncluded": false,
       "featured": false,
       "steamSubscriptions": 99
+    },
+    {
+      "icao": "NZAA",
+      "name": "Auckland Airport",
+      "lat": -37.0081,
+      "lng": 174.792,
+      "country": {
+        "code": "NZ",
+        "name": "New Zealand"
+      },
+      "continent": {
+        "code": "OC",
+        "name": "Australia & Oceania"
+      },
+      "status": "released",
+      "source": "steam",
+      "author": "76561198152806071",
+      "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/?id=3783201975",
+      "discordThread": null,
+      "lastUpdated": "2026-08-19T14:29:14+00:00",
+      "defaultIncluded": false,
+      "featured": false,
+      "steamSubscriptions": 2
     },
     {
       "icao": "OMDB",
